@@ -1,0 +1,51 @@
+{% load i18n grp_dashboard_tags %}
+
+{{ dashboard.media }}
+
+<div class="g-d-c">
+    <div class="g-d-12 g-d-f">
+        <div class="grp-module actions grp-dashboard-module grp-collapse grp-open">
+            <h2 class="module_title grp-collapse-handler">Chart visist</h2>
+            <div class="grp-module" style="background-color: white; display: flex; align-items: center; height: 229px;">
+                <canvas id="chart-1" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="g-d-6">
+        <div class="grp-module actions grp-dashboard-module grp-collapse grp-open">
+            <h2 class="module_title grp-collapse-handler">User aggregation</h2>
+            <div class="grp-module" style="background-color: white; display: flex; align-items: center; height: 229px;">
+                <canvas id="chart-2" width="200" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="g-d-6 g-d-l">
+        <div id="chart-3">
+            <!-- <h1>asfasdf</h1> -->
+        </div>
+    </div>
+</div>
+
+<div class="g-d-c">
+    <div class="g-d-12 g-d-f" id="column_1">
+        {% for module in dashboard.children %}
+        {% if module.column == 1 %}
+        {% grp_render_dashboard_module module forloop.counter %}
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="g-d-6" id="column_2">
+        {% for module in dashboard.children %}
+        {% if module.column == 2 %}
+        {% grp_render_dashboard_module module forloop.counter %}
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="g-d-6 g-d-l" id="column_3">
+        {% for module in dashboard.children %}
+        {% if module.column == 3 %}
+        {% grp_render_dashboard_module module forloop.counter %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>

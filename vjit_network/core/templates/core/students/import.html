@@ -1,0 +1,20 @@
+{% extends "admin/change_form.html" %}
+
+{% load i18n %}
+{% load admin_urls %}
+{% load static %}
+
+{% block content %}
+<form action="." method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+        This importer will import the following fields: id, create_at, name, slug, description, create_by
+    </p>
+    <br>
+    {{ form.as_p }}
+    <br>
+    <div class="submit-row">
+      <input type="submit" class="default" name="confirm" value="{% trans 'Confirm import' %}">
+    </div>
+</form>
+{% endblock %}

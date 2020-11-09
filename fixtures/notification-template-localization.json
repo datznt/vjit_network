@@ -1,0 +1,146 @@
+[
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 4,
+        "fields": {
+            "notification_template": 4,
+            "language": "vi",
+            "title_html": "<p><strong>{{actor.full_name}} </strong>v\u1eeba b&igrave;nh lu\u1eadn v&agrave;o b&agrave;i vi\u1ebft c\u1ee7a b\u1ea1n</p>",
+            "title_plantext": "{{actor.full_name}} v\u1eeba b\u00ecnh lu\u1eadn v\u00e0o b\u00e0i vi\u1ebft c\u1ee7a b\u1ea1n",
+            "content_html": "<p><strong>{{actor.full_name}}</strong>: {{payload.content}}.</p>",
+            "content_plantext": "{{actor.full_name}}: {{payload.content}}."
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 5,
+        "fields": {
+            "notification_template": 4,
+            "language": "en",
+            "title_html": "<p><strong>{{actor.full_name}} </strong>has just commented on your post</p>",
+            "title_plantext": "{{actor.full_name}} has just commented on your post",
+            "content_html": "<p><strong>{{actor.full_name}}</strong>: {{payload.content}}.</p>",
+            "content_plantext": "{{actor.full_name}}: {{payload.content}}."
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 6,
+        "fields": {
+            "notification_template": 5,
+            "language": "vi",
+            "title_html": "<p><strong>{{actor.full_name}} </strong>v\u1eeba tr\u1ea3 l\u1eddi b&igrave;nh lu\u1eadn c\u1ee7a b\u1ea1n</p>",
+            "title_plantext": "{{actor.full_name}} v\u1eeba tr\u1ea3 l\u1eddi b\u00ecnh lu\u1eadn c\u1ee7a b\u1ea1n",
+            "content_html": "<p><strong>{{actor.full_name}}</strong>: {{payload.content}}.</p>",
+            "content_plantext": "{{actor.full_name}}: {{payload.content}}."
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 7,
+        "fields": {
+            "notification_template": 5,
+            "language": "en",
+            "title_html": "<p><strong>{{actor.full_name}} </strong>has just replied to your comment</p>",
+            "title_plantext": "{{actor.full_name}} has just replied to your comment",
+            "content_html": "<p><strong>{{actor.full_name}}</strong>: {{payload.content}}.</p>",
+            "content_plantext": "{{actor.full_name}}: {{payload.content}}."
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 8,
+        "fields": {
+            "notification_template": 6,
+            "language": "vi",
+            "title_html": "<p><strong>{{payload.title}}</strong>&nbsp;\u0111&atilde; \u0111\u0103ng m\u1ed9t b&agrave;i vi\u1ebft m\u1edbi v&agrave;o nh&oacute;m&nbsp;<strong>{{payload.group.name}}</strong></p>",
+            "title_plantext": "{{payload.title}}\u00a0\u0111\u00e3 \u0111\u0103ng m\u1ed9t b\u00e0i vi\u1ebft m\u1edbi v\u00e0o nh\u00f3m {{payload.group.name}}",
+            "content_html": "<p><strong>{{payload.title}}</strong>: {{payload.content}}</p>",
+            "content_plantext": "{{payload.title}}: {{payload.content}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 9,
+        "fields": {
+            "notification_template": 6,
+            "language": "en",
+            "title_html": "<p><strong>{{payload.title}}</strong>&nbsp;has posted a new article in the group <strong>{{payload.group.name}}</strong></p>",
+            "title_plantext": "{{payload.title}}\u00a0has posted a new article in the group {{payload.group.name}}",
+            "content_html": "<p><strong>{{payload.title}}</strong>: {{payload.content}}</p>",
+            "content_plantext": "{{payload.title}}: {{payload.content}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 10,
+        "fields": {
+            "notification_template": 7,
+            "language": "vi",
+            "title_html": "<p>Ph&ecirc; duy\u1ec7t b&agrave;i vi\u1ebft c\u1ee7a&nbsp;<strong>{{payload.title}}</strong></p>",
+            "title_plantext": "Ph\u00ea duy\u1ec7t b\u00e0i vi\u1ebft c\u1ee7a\u00a0{{payload.title}}",
+            "content_html": "<p><strong>{{payload.title}}</strong>&nbsp;\u0111&atilde; \u0111\u0103ng m\u1ed9t b&agrave;i vi\u1ebft m\u1edbi v&agrave;o nh&oacute;m&nbsp;<strong>{{payload.group.name}}</strong></p>",
+            "content_plantext": "{{payload.title}}\u00a0\u0111\u00e3 \u0111\u0103ng m\u1ed9t b\u00e0i vi\u1ebft m\u1edbi v\u00e0o nh\u00f3m\u00a0{{payload.group.name}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 11,
+        "fields": {
+            "notification_template": 7,
+            "language": "en",
+            "title_html": "<p>Approve post of <strong>{{payload.title}}</strong></p>",
+            "title_plantext": "Approve post of {{payload.title}}",
+            "content_html": "<p>{{payload.title}} has posted a new article in the group {{payload.group.name}}</p>",
+            "content_plantext": "{{payload.title}}\u00a0has posted a new article in the group {{payload.group.name}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 12,
+        "fields": {
+            "notification_template": 8,
+            "language": "vi",
+            "title_html": "<p>B&agrave;i vi\u1ebft c\u1ee7a b\u1ea1n v\u1eeba \u0111\u01b0\u1ee3c ch\u1ea5p nh\u1eadn</p>",
+            "title_plantext": "B\u00e0i vi\u1ebft c\u1ee7a b\u1ea1n v\u1eeba \u0111\u01b0\u1ee3c ch\u1ea5p nh\u1eadn",
+            "content_html": "<p>{{payload.content}}</p>",
+            "content_plantext": "{{payload.content}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 13,
+        "fields": {
+            "notification_template": 8,
+            "language": "en",
+            "title_html": "<p>Your post has just been accepted</p>",
+            "title_plantext": "Your post has just been accepted",
+            "content_html": "<p>{{payload.content}}</p>",
+            "content_plantext": "{{payload.content}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 14,
+        "fields": {
+            "notification_template": 9,
+            "language": "vi",
+            "title_html": "<p>B&agrave;i vi\u1ebft c\u1ee7a b\u1ea1n v\u1eeba b\u1ecb t\u1eeb ch\u1ed1i</p>",
+            "title_plantext": "B\u00e0i vi\u1ebft c\u1ee7a b\u1ea1n v\u1eeba \u0111\u01b0\u1ee3c b\u1ecb t\u1eeb ch\u1ed1i",
+            "content_html": "<p>{{payload.content}}</p>",
+            "content_plantext": "{{payload.content}}"
+        }
+    },
+    {
+        "model": "vjit_network.api.notificationtemplatelocalization",
+        "pk": 15,
+        "fields": {
+            "notification_template": 9,
+            "language": "en",
+            "title_html": "<p>Your post has just been rejected</p>",
+            "title_plantext": "Your post has just been rejected",
+            "content_html": "<p>{{payload.content}}</p>",
+            "content_plantext": "{{payload.content}}"
+        }
+    }
+]

@@ -1,0 +1,5 @@
+.grp-module.grp-table .grp-placeholder-related-fk,
+.grp-module.grp-table .grp-placeholder-related-m2m,
+.grp-module.grp-table .grp-placeholder-related-generic {
+    margin: 0 0 -20px 290px !important;
+}

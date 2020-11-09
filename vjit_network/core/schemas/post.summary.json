@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "comments_count": {
+            "type": "integer"
+        },
+        "views_count": {
+            "type": "integer"
+        },
+        "shares_count": {
+            "type": "integer"
+        },
+        "reactions_count": {
+            "type": "object",
+            "properties": {
+                "1": {
+                    "type": "integer"
+                },
+                "2": {
+                    "type": "integer"
+                },
+                "3": {
+                    "type": "integer"
+                },
+                "4": {
+                    "type": "integer"
+                },
+                "5": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ]
+        }
+    },
+    "required": [
+        "comments_count",
+        "views_count",
+        "shares_count",
+        "reactions_count"
+    ]
+}

@@ -1,0 +1,11 @@
+.import-preview th,
+.import-preview td{
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+.import-preview th{
+    color: #6c757d;
+    font-weight: bold;
+    background-color: #f1f5f7;
+    border-color: #dee2e6;
+}

@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "follows_count": {
+            "type": "integer"
+        },
+        "posts_count": {
+            "type": "integer"
+        },
+        "members_count": {
+            "type": "integer"
+        },
+        "shareds_count": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "follows_count",
+        "posts_count",
+        "members_count",
+        "shareds_count"
+    ]
+}

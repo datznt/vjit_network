@@ -1,0 +1,36 @@
+Django==3.0
+djangorestframework==3.11.0
+psycopg2==2.8.4
+drf-flex-fields==0.7.5                      #https://github.com/rsinger86/drf-flex-fields
+django-filter==2.0
+coreapi==2.3.3                              #https://github.com/core-api/python-client
+coreapi-cli==1.0.9
+drf-autodocs==0.4.4                         #https://github.com/iMakedonsky/drf-autodocs
+django-ckeditor==5.9.0                      #https://django-ckeditor.readthedocs.io/en/latest/#installation
+django-rest-framework-social-oauth2==1.1.0  #https://github.com/RealmTeam/django-rest-framework-social-oauth2
+django-cors-headers==3.2.1
+djangorestframework-jwt==1.11.0
+django-oauth-toolkit==1.2.0                 #https://github.com/jazzband/django-oauth-toolkit
+django-storages==1.9.1                      #https://django-storages.readthedocs.io/en/latest/index.html
+Pillow==7.1.2
+opencv-python==4.1.2.30
+django-debug-toolbar==2.2
+django-redis==4.11.0                        #https://github.com/jazzband/django-redis
+drf-extensions==0.6.0                       #https://github.com/chibisov/drf-extensions
+rest-framework-cache==0.1
+channels==2.4.0                             #https://channels.readthedocs.io/en/latest/installation.html
+channels-redis==2.4.2
+jsonschema==3.2.0 
+onesignal-notifications==0.2.6
+django-phonenumber-field[phonenumbers]==4.0.0
+django-address==0.2.1
+extraction==0.3
+drf-writable-nested==0.6.0                  #https://github.com/beda-software/drf-writable-nested
+django-admin-interface==0.12.2              #https://github.com/fabiocaccamo/django-admin-interface
+django-autoslug==1.9.7                      #django-autoslug-1.9.7   
+django-admin-sortable2==0.7.6               #https://django-admin-sortable2.readthedocs.io/en/latest/installation.html
+django-safedelete==0.5.6                    #https://github.com/makinacorpus/django-safedelete
+django-grappelli==2.14.2
+django-import-export==2.4.0                 #https://django-import-export.readthedocs.io/en/latest/installation.html
+pandas==1.1.4
+XlsxWriter==1.3.7
