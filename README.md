@@ -19,7 +19,7 @@ python manage.py loaddata fixtures/initial_teachers_app.json
 python manage.py runserver
 ```
 mở browser nhập **[www.mysite.local:8000](http://www.mysite.local:8000/)** :ok_hand:
- ## 1. chỉnh sửa file đa ngôn ngữ
+ ## 2. chỉnh sửa file đa ngôn ngữ
  kiểm tra các ngôn ngữ hỗ trợ trong **[locale](locale/)/** \
  :warning: mặc định là tiếng anh(**en**) \
  :pencil2: label được định nghĩa trong template html. ví dụ: ```{% trans "Home" %}```
