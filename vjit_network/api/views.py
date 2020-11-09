@@ -242,9 +242,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     def posts(self, request, slug=None):
         # user_req = request.user
         instance = self.get_object()
-        # if not instance.group_members.filter(user=user_req, is_active=True).exists():
-        #     raise PermissionDenied()
-        # qs = Post.objects.select_related( 'create_by', 'via_type', ).prefetch_related( 'attaches', 'views', 'comments', 'via_object' ).filter(group=instance, public_code=Post.PublicCode.ACCEPT).order_by("-create_at")
         qs = instance.posts.select_related('create_by', 'via_type', ).prefetch_related('attaches', 'views', 'comments', 'via_object').filter(
             group=instance, public_code=Post.PublicCode.ACCEPT).order_by("-create_at")
         filter_results = filtersets.PostFilter(request.GET, queryset=qs)
