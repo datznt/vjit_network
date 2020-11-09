@@ -68,7 +68,7 @@ class NotificationTemplateLocalization(models.Model):
         NotificationTemplate, on_delete=models.CASCADE, related_name='localizations')
     language = models.CharField(
         verbose_name=_('Language'), max_length=2, default='vi', choices=settings.LANGUAGES,
-        help_text=_('')
+        
     )
     title_html = RichTextField(verbose_name=_(
         'Title format html'), default=None)
@@ -149,15 +149,13 @@ class Notification(models.Model):
     )
     actor = models.ForeignKey(
         verbose_name=_('Actor'), to=User, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_actor',
-        help_text=_('')
+        
     )
     template = models.ForeignKey(
         verbose_name=_('Notification template'), to=NotificationTemplate, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_created',
-        help_text=_('')
     )
     create_at = models.DateTimeField(
         verbose_name=_('Creation time'), auto_now_add=True,
-        help_text=_('')
     )
     payload = JSONField(
         verbose_name=_('Payload'), encoder=json.JSONEncoder, null=True, blank=True,
