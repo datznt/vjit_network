@@ -16,7 +16,8 @@ from grappelli.dashboard import modules, Dashboard
 from import_export.admin import ImportMixin, ImportExportActionModelAdmin
 from io import BytesIO
 
-from vjit_network.core import models, utils, customfields, resources, business, forms
+from vjit_network.core import utils, customfields, resources, business, forms
+from vjit_network.core.models import Post, File, Company, Comment, View, Industry, Tag, Skill, Link, User, Student, Group, GroupUser, Contact, get_type, UserSetting, AttachPost, Approval, Experience, Education
 
 import pandas as pd
 
@@ -78,7 +79,7 @@ class MyDashboard(Dashboard):
 
 
 class industry_inline(admin.TabularInline):
-    model = models.Industry
+    model = Industry
     fields = ('id', 'name')
 
 
@@ -107,12 +108,12 @@ class UserAdmin(DjangoUserAdmin):
     list_per_page = 10
 
     class user_setting_inline(admin.StackedInline):
-        model = models.UserSetting
+        model = UserSetting
         fields = ('language',)
 
     class group_user_inline(admin.TabularInline):
         search_fields = ('group__name',)
-        model = models.GroupUser
+        model = GroupUser
         fields = ('group', 'is_active',)
         autocomplete_fields = ('group',)
 
@@ -133,7 +134,7 @@ class GroupAdmin(CustomImportExportActionModelAdmin, ModelAdmin):
     resource_class = resources.GroupResource
 
     class group_user_inline(admin.TabularInline):
-        model = models.GroupUser
+        model = GroupUser
         fields = ('user', 'is_active',)
         autocomplete_fields = ('user',)
 
@@ -143,7 +144,7 @@ class GroupAdmin(CustomImportExportActionModelAdmin, ModelAdmin):
     list_per_page = 10
 
     def view_all_member(self, instance):
-        ct = models.get_type(models.GroupUser)
+        ct = get_type(GroupUser)
         link = utils.reverse('admin:{0}_{1}_{2}'.format(ct.app_label, ct.model, 'changelist'), query_kwargs={
             'group__id': instance.id
         })
@@ -171,14 +172,14 @@ class PostAdmin(ModelAdmin):
     }
 
     class attach_post_inline(admin.TabularInline):
-        model = models.AttachPost
+        model = AttachPost
         extra = 1
         related_lookup_fields = {
             'generic': [['content_type', 'object_id'], ],
         }
 
     class approval_inline(admin.TabularInline):
-        model = models.Approval
+        model = Approval
         readonly_fields = ('user_reason', 'user_accept', 'create_at')
         extra = 0
         ordering = ['id']
@@ -191,15 +192,15 @@ class PostAdmin(ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         via_type, via_id = None, None
-        req_user: models.User = request.user
+        req_user: User = request.user
         if req_user.is_staff:
-            via_type = models.get_type(models.User)
+            via_type = get_type(User)
             via_id = req_user.pk
         elif req_user.is_student:
-            via_type = models.get_type(models.Student)
+            via_type = get_type(Student)
             via_id = req_user.student.pk
         elif req_user.is_company:
-            via_type = models.get_type(models.Company)
+            via_type = get_type(Company)
             via_id = req_user.company.pk
         if via_id is None:
             raise Exception('you need update the profile')
@@ -255,7 +256,7 @@ class CommentAdmin(ModelAdmin):
     readonly_fields = ('replies_count', 'create_by')
 
     class reply_inline(GenericTabularInline):
-        model = models.Comment
+        model = Comment
         verbose_name = _('Reply comment')
         verbose_name_plural = _('Replies comment')
         readonly_fields = ('replies_count',)
@@ -340,12 +341,12 @@ class StudentAdmin(ModelAdmin):
     student_import_template = "core/students/import.html"
 
     class experience_inlines(admin.StackedInline):
-        model = models.Experience
+        model = Experience
         autocomplete_fields = ('company_lookup',)
         extra = 1
 
     class education_inlines(admin.StackedInline):
-        model = models.Education
+        model = Education
         extra = 1
 
     inlines = [experience_inlines, education_inlines, ]
@@ -394,7 +395,8 @@ class StudentAdmin(ModelAdmin):
     def import_student(self, request):
         # ...
         if request.method == 'POST':
-            form = forms.StudentUploadForm(data=request.POST, files=request.FILES)
+            form = forms.StudentUploadForm(
+                data=request.POST, files=request.FILES)
             if form.is_valid():
                 print('pke')
             else:
@@ -424,18 +426,19 @@ class ContactAdmin(ModelAdmin):
     list_display = ('name', 'phone', 'email', 'create_at')
     date_hierarchy = "create_at"
 
-admin.site.register(models.Post, PostAdmin)
-admin.site.register(models.File, FileAdmin)
-admin.site.register(models.Company, CompanyAdmin)
-admin.site.register(models.Comment, CommentAdmin)
-admin.site.register(models.View, ViewAdmin)
-admin.site.register(models.Industry)
-admin.site.register(models.Tag)
-admin.site.register(models.Skill)
+
+admin.site.register(Post, PostAdmin)
+admin.site.register(File, FileAdmin)
+admin.site.register(Company, CompanyAdmin)
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(View, ViewAdmin)
+admin.site.register(Industry)
+admin.site.register(Tag)
+admin.site.register(Skill)
 admin.site.register(ContentType, ContentTypeAdmin)
-admin.site.register(models.Link, LinkAdmin)
-admin.site.register(models.User, UserAdmin)
-admin.site.register(models.Student, StudentAdmin)
-admin.site.register(models.Group, GroupAdmin)
-admin.site.register(models.GroupUser, GroupUserAdmin)
-admin.site.register(models.Contact, ContactAdmin)
+admin.site.register(Link, LinkAdmin)
+admin.site.register(User, UserAdmin)
+admin.site.register(Student, StudentAdmin)
+admin.site.register(Group, GroupAdmin)
+admin.site.register(GroupUser, GroupUserAdmin)
+admin.site.register(Contact, ContactAdmin)

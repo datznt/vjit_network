@@ -27,8 +27,8 @@ from django.views.decorators.cache import cache_page
 from rest_framework.pagination import PageNumberPagination
 
 
-from vjit_network.core import models, tokens
-from vjit_network.api import models as apimodels
+from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode
+from vjit_network.api.models import NotificationTemplate, NotificationTemplateLocalization, Notification, UserNotification, Device
 from vjit_network.api.bussines import otp_code_for_user
 from vjit_network.common.mixins import LoggingViewSetMixin
 from vjit_network.api import serializers, permissions, utils, filtersets
@@ -52,7 +52,7 @@ class UserViewSet(viewsets.ModelViewSet):
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.UserFilter
     search_fields = ('username', 'last_name', 'email')
-    queryset = models.User.objects.all()
+    queryset = User.objects.all()
     permission_classes = (permissions.UserPermission,)
     serializer_classes = {
         'list': serializers.UserSerializer,
@@ -71,7 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user_auth = request.user
         if not (user_auth.is_authenticated and user_auth.is_active):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        models.VisitLogger.increment_for_user(user=user_auth)
+        VisitLogger.increment_for_user(user=user_auth)
         user_data = self.get_serializer(user_auth).data
         serializer_data = {'user': user_data}
         return Response(data=serializer_data, status=status.HTTP_200_OK)
@@ -80,11 +80,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def news_feed(self, request):
         user_req = request.user
         groups_user_is_member = user_req.group_members.all().values_list('group', flat=True)
-        blockers = models.BlockUser.objects.as_user(user_req, to_list_user=True)
-        qs = models.Post.objects.select_related('create_by', 'via_type',).prefetch_related(
+        blockers = BlockUser.objects.as_user(user_req, to_list_user=True)
+        qs = Post.objects.select_related('create_by', 'via_type',).prefetch_related(
             'attaches', 'views', 'comments', 'via_object').filter(
                 group__in=groups_user_is_member,
-                public_code=models.Post.PublicCode.ACCEPT
+                public_code=Post.PublicCode.ACCEPT
         ).exclude(create_by__in=blockers).order_by("-create_at")
         page = self.paginate_queryset(qs)
         if page is not None:
@@ -190,7 +190,7 @@ class AuthViewSet(viewsets.GenericViewSet):
     def password_reset_renew(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        req_user: models.User = self.request.user
+        req_user: User = self.request.user
         req_user.set_password(serializer.validated_data.get('password'))
         req_user.save()
         return Response(status=status.HTTP_200_OK)
@@ -209,7 +209,7 @@ class UserSettingViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, vie
     API endpoint that allows users to be viewed or edited.
     """
     lookup_field = 'id'
-    queryset = models.UserSetting.objects.all()
+    queryset = UserSetting.objects.all()
     serializer_class = serializers.UserSettingSerializer
     permission_classes = (permissions.UserSettingPermission,)
 
@@ -236,7 +236,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = filtersets.GroupFilter
     search_fields = ('name', 'slug',)
-    queryset = models.Group.objects.all()
+    queryset = Group.objects.all()
 
     @action(methods=['GET'], detail=True, url_path='posts', permission_classes=[IsAuthenticated, ])
     def posts(self, request, slug=None):
@@ -244,9 +244,9 @@ class GroupViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         # if not instance.group_members.filter(user=user_req, is_active=True).exists():
         #     raise PermissionDenied()
-        # qs = models.Post.objects.select_related( 'create_by', 'via_type', ).prefetch_related( 'attaches', 'views', 'comments', 'via_object' ).filter(group=instance, public_code=models.Post.PublicCode.ACCEPT).order_by("-create_at")
+        # qs = Post.objects.select_related( 'create_by', 'via_type', ).prefetch_related( 'attaches', 'views', 'comments', 'via_object' ).filter(group=instance, public_code=Post.PublicCode.ACCEPT).order_by("-create_at")
         qs = instance.posts.select_related('create_by', 'via_type', ).prefetch_related('attaches', 'views', 'comments', 'via_object').filter(
-            group=instance, public_code=models.Post.PublicCode.ACCEPT).order_by("-create_at")
+            group=instance, public_code=Post.PublicCode.ACCEPT).order_by("-create_at")
         filter_results = filtersets.PostFilter(request.GET, queryset=qs)
         page = self.paginate_queryset(filter_results.qs)
         if page is not None:
@@ -292,7 +292,7 @@ class GroupUserViewSet(viewsets.ModelViewSet):
     filterset_class = filtersets.GroupMemberFilter
     search_fields = ('user__username', 'user__last_name',
                      'user__email', 'user__first_name',)
-    queryset = models.GroupUser.objects.all()
+    queryset = GroupUser.objects.all()
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -306,7 +306,7 @@ class FileViewSet(viewsets.ModelViewSet):
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.FileFilterSet
     search_fields = ('name',)
-    queryset = models.File.objects.all()
+    queryset = File.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(create_by=self.request.user)
@@ -322,7 +322,7 @@ class PostViewSet(LoggingViewSetMixin, viewsets.ModelViewSet):
     """
     ordering = ['-create_at']
     serializer_class = serializers.PostSerializer
-    queryset = (models.Post.objects.select_related('create_by', 'via_type',).prefetch_related(
+    queryset = (Post.objects.select_related('create_by', 'via_type',).prefetch_related(
         'attaches', 'views', 'comments', 'via_object', 'approvals'))
     permission_classes = (permissions.PostPermission,)
     filter_backends = (filters.DjangoFilterBackend,
@@ -336,7 +336,7 @@ class ViewViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['-create_at']
-    queryset = (models.View.objects.select_related('create_by', 'post'))
+    queryset = (View.objects.select_related('create_by', 'post'))
     serializer_class = serializers.ViewSerializer
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.DjangoFilterBackend,
@@ -346,7 +346,7 @@ class ViewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        blockers = models.BlockUser.objects.as_user(
+        blockers = BlockUser.objects.as_user(
             self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
@@ -356,7 +356,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['create_at']
-    queryset = (models.Comment.objects.select_related('create_by', 'parent',
+    queryset = (Comment.objects.select_related('create_by', 'parent',
                                                       'content_type').prefetch_related('content_object'))
     serializer_class = serializers.CommentSerializer
     permission_classes = (permissions.IsMyObjectPermission,)
@@ -371,7 +371,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        blockers = models.BlockUser.objects.as_user(
+        blockers = BlockUser.objects.as_user(
             self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
@@ -379,7 +379,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class StudentViewSet(viewsets.ModelViewSet):
     ordering = ['-user']
     lookup_field = 'user'
-    queryset = models.Student.objects.all()
+    queryset = Student.objects.all()
     permission_classes = (permissions.StudentPermission,)
     serializer_class = serializers.StudentSerializer
 
@@ -390,7 +390,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     """
     ordering = ['-name']
     lookup_field = 'slug'
-    queryset = models.Company.objects.all()
+    queryset = Company.objects.all()
     serializer_class = serializers.CompanySerializer
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
@@ -415,7 +415,7 @@ class TagViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.List
     API endpoint that allows users to be viewed or edited.
     """
     lookup_field = 'id'
-    queryset = models.Tag.objects.all()
+    queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -425,7 +425,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     lookup_field = 'id'
-    queryset = models.Skill.objects.all()
+    queryset = Skill.objects.all()
     serializer_class = serializers.SkillSerializer
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.DjangoFilterBackend,
@@ -438,7 +438,7 @@ class IndustryViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     lookup_field = 'id'
-    queryset = models.Industry.objects.all()
+    queryset = Industry.objects.all()
     serializer_class = serializers.IndustrySerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -448,7 +448,7 @@ class UserNotificationViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['-notification__create_at']
-    queryset = (apimodels.UserNotification.objects.select_related(
+    queryset = (UserNotification.objects.select_related(
         "user", "notification"))
     serializer_class = serializers.UserNotificationSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -466,7 +466,7 @@ class UserDeviceViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['-id']
-    queryset = (apimodels.Device.objects.select_related(
+    queryset = (Device.objects.select_related(
         "user"))
     serializer_class = serializers.DeviceSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -484,7 +484,7 @@ class LinkViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['-create_at']
-    queryset = (models.Link.objects.select_related(
+    queryset = (Link.objects.select_related(
         "create_by"))
     serializer_class = serializers.LinkSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -501,7 +501,7 @@ class LinkViewSet(viewsets.ModelViewSet):
 class ContactViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ContactSerializer
     permission_classes = (AllowAny,)
-    queryset = models.Contact.objects.all()
+    queryset = Contact.objects.all()
 
 
 class BlockUserViewSet(viewsets.ModelViewSet):
@@ -509,7 +509,7 @@ class BlockUserViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     ordering = ['-block_at']
-    queryset = (models.BlockUser.objects.select_related(
+    queryset = (BlockUser.objects.select_related(
         "create_by", 'blocked_user'))
     serializer_class = serializers.BlockUserSerializer
     filter_backends = (filters.DjangoFilterBackend,

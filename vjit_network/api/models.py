@@ -7,10 +7,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.postgres.fields import JSONField
 from django.template import Template, Context
 from django.contrib.sites.models import Site
-
-from vjit_network.core import models as coremodels
-
+from vjit_network.core.models import UserSetting
 from ckeditor.fields import RichTextField
+
 import uuid
 import json
 
@@ -97,7 +96,7 @@ class UserNotification(models.Model):
     def get_payload(self):
         data = {}
         notify_template = self.notification.template
-        user_lang_code = coremodels.UserSetting.objects.get(
+        user_lang_code = UserSetting.objects.get(
             user=self.user).language
         notification_localization = notify_template.localizations.filter(
             language=user_lang_code).first()

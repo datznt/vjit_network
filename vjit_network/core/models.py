@@ -124,13 +124,6 @@ class File(models.Model):
         if not thumbnails:
             return None
         return thumbnails[-1]
-        # if not self.has_thumbnail():
-        #     return None
-        # storage = self.raw.storage
-        # default_site_setting = Site.objects.get_current()
-        # relative_url = storage.url(self.thumbnails['path']) + self.thumbnails['thumbs'][-1]
-        # absolute_url = urljoin(default_site_setting.domain, relative_url)
-        # return absolute_url
 
     def __str__(self):
         return self.name
@@ -179,15 +172,6 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
-
-    # def _get_unique_slug(self):
-    #     slug = slugify(self.username)
-    #     unique_slug = slug
-    #     num = 1
-    #     while User.objects.filter(slug=unique_slug).exists():
-    #         unique_slug = '{}-{}'.format(slug, num)
-    #         num += 1
-    #     return unique_slug
 
     @property
     def full_name(self):

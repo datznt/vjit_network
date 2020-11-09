@@ -1,4 +1,4 @@
-from vjit_network.core import models
+from vjit_network.core.models import User, GroupUser, Education, Group, Student
 from import_export import resources, fields, widgets, instance_loaders
 
 GROUP_IMPORT_EXPORT_FIELDS = ('id', 'create_at', 'name', 'slug',
@@ -10,7 +10,7 @@ STUDENT_IMPORT_EXPORT_FIELDS = ('user', 'username', 'password', 'last_name', 'fi
 
 class GroupResource(resources.ModelResource):
     class Meta:
-        model = models.Group
+        model = Group
         fields = GROUP_IMPORT_EXPORT_FIELDS
         export_order = GROUP_IMPORT_EXPORT_FIELDS
 
@@ -23,25 +23,25 @@ class StudentResource(resources.ModelResource):
         attribute='user',
         column_name='username',
         widget=widgets.ForeignKeyWidget(
-            models.User, 'pk')
+            User, 'pk')
     )
     first_name = fields.Field(
         attribute='user',
         column_name='first_name',
         widget=widgets.ForeignKeyWidget(
-            models.User, 'pk')
+            User, 'pk')
     )
     last_name = fields.Field(
         attribute='user',
         column_name='last_name',
         widget=widgets.ForeignKeyWidget(
-            models.User, 'pk')
+            User, 'pk')
     )
     email = fields.Field(
         attribute='user',
         column_name='email',
         widget=widgets.ForeignKeyWidget(
-            models.User, 'pk')
+            User, 'pk')
     )
     password = fields.Field(
         attribute='password',
@@ -52,41 +52,41 @@ class StudentResource(resources.ModelResource):
         attribute='educations',
         column_name='school_name',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'school_name')
+            Education, ';', 'school_name')
     )
     class_id = fields.Field(
         attribute='educations',
         column_name='class_id',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'class_id')
+            Education, ';', 'class_id')
     )
     student_code = fields.Field(
         attribute='educations',
         column_name='student_code',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'student_code')
+            Education, ';', 'student_code')
     )
     field_of_study = fields.Field(
         attribute='educations',
         column_name='field_of_study',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'field_of_study')
+            Education, ';', 'field_of_study')
     )
     start_year = fields.Field(
         attribute='educations',
         column_name='start_year',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'start_year')
+            Education, ';', 'start_year')
     )
     end_year = fields.Field(
         attribute='educations',
         column_name='end_year',
         widget=widgets.ManyToManyWidget(
-            models.Education, ';', 'end_year')
+            Education, ';', 'end_year')
     )
 
     class Meta:
-        model = models.Student
+        model = Student
         fields = STUDENT_IMPORT_EXPORT_FIELDS
         export_order = STUDENT_IMPORT_EXPORT_FIELDS
         import_id_fields = ('user',)
@@ -102,7 +102,7 @@ class StudentResource(resources.ModelResource):
             user_email = row.get('email')
             if not password:
                 password = username
-            user = models.User.objects.create(
+            user = User.objects.create(
                 username=username,
                 password=password,
                 email=user_email, 

@@ -1,8 +1,4 @@
-# from dal import autocomplete
 from django import forms
-
-from vjit_network.core import models
-
 import pandas as pd
 
 

@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 
-from vjit_network.core import models
-from vjit_network.api import models as apimodels
+from vjit_network.core.models import Comment, User, View, Group, GroupUser, Post, File, User
+from vjit_network.api.models import Device, UserNotification
 
 
 class CommentFilter(filters.FilterSet):
@@ -9,26 +9,26 @@ class CommentFilter(filters.FilterSet):
         field_name='parent', lookup_expr='isnull')
 
     class Meta:
-        model = models.Comment
+        model = Comment
         fields = ['create_by', 'create_at', 'parent',
                   'parent__isnull', 'content', 'content_type', 'object_id']
 
 
 class UserFilter(filters.FilterSet):
     class Meta:
-        model = models.User
+        model = User
         fields = ['username', 'email', 'first_name', 'last_name',]
 
 
 class ViewFilterSet(filters.FilterSet):
     class Meta:
-        model = models.View
+        model = View
         fields = ['create_by', 'post']
 
 
 class GroupFilter(filters.FilterSet):
     class Meta:
-        model = models.Group
+        model = Group
         fields = ['name', 'slug',
                   # 'group_user_users__user',
                   # 'group_user_users__is_admin'
@@ -40,7 +40,7 @@ class GroupMemberFilter(filters.FilterSet):
     is_active = filters.BooleanFilter(field_name="is_active")
 
     class Meta:
-        model = models.GroupUser
+        model = GroupUser
         fields = ['group', 'user', 'is_active', ]
 
 
@@ -49,7 +49,7 @@ class PostFilter(filters.FilterSet):
         field_name='attaches__content_type')
 
     class Meta:
-        model = models.Post
+        model = Post
         fields = ['create_by', 'via_type', 'public_code',
                   'via_id', 'create_at', 'content']
 
@@ -65,7 +65,7 @@ class FileFilterSet(filters.FilterSet):
     create_by = filters.NumberFilter(field_name='create_by')
 
     class Meta:
-        model = models.File
+        model = File
         fields = ["size__gte", "size__lte", "name__icontains",
                   "mimetype__istartswith", "create_at", "create_by"]
 
@@ -74,7 +74,7 @@ class UserNotificationFilterSet(filters.FilterSet):
     user = filters.NumberFilter(field_name="user")
 
     class Meta:
-        model = apimodels.UserNotification
+        model = UserNotification
         fields = ['user', ]
 
 
@@ -82,5 +82,5 @@ class DeviceFilterSet(filters.FilterSet):
     user = filters.NumberFilter(field_name='user')
 
     class Meta:
-        model = apimodels.Device
+        model = Device
         fields = ['user']

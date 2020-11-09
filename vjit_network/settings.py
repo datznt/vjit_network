@@ -50,15 +50,15 @@ INSTALLED_APPS = [
     'ckeditor',
     'channels',
     'debug_toolbar',
-    'graphene_django',
     'import_export',
 
-    'core',
-    'vjit_network.api',
+    'vjit_network.core.apps.CoreConfig',
+    'vjit_network.api.apps.ApiConfig',
+    'vjit_network.common.apps.CommonConfig',
 ]
 
 MIDDLEWARE = [
-    'vjit_network.core.middlewares.RangesMiddleware',
+    'vjit_network.common.middlewares.RangesMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -74,7 +74,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'vjit_network.urls'
 
-AUTH_USER_MODEL = 'vjit_network.core.User'
+AUTH_USER_MODEL = 'core.User'
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
@@ -149,7 +149,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ('vjit_network.core.backends.CustomBackend',)
+AUTHENTICATION_BACKENDS = ('vjit_network.common.backends.CustomBackend',)
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

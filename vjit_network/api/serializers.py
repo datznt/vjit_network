@@ -5,8 +5,8 @@ from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.exceptions import ValidationError
 
 from vjit_network.core.utils import reverse
-from vjit_network.core import models
-from vjit_network.api import models as apimodels
+from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode
+from vjit_network.api.models import NotificationTemplate, NotificationTemplateLocalization, Notification, UserNotification, Device
 from vjit_network.common.validators import MaxValueValidator, MinValueValidator, OtpValidator
 from vjit_network.api.bussines import otp_is_expired
 
@@ -35,7 +35,7 @@ class SiteSerializer(FlexFieldsModelSerializer):
 
 class IndustrySerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.Industry
+        model = Industry
         fields = '__all__'
 
 
@@ -43,13 +43,13 @@ class IndustrySerializer(FlexFieldsModelSerializer):
 #     label = serializers.ReadOnlyField()
 
 #     class Meta:
-#         model = models.Address
+#         model = Address
 #         fields = '__all__'
 
 
 class SkillSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.Skill
+        model = Skill
         fields = '__all__'
         expandable_fields = {
             'create_by': ('vjit_network.api.UserSerializer', {'many': False, }),
@@ -58,20 +58,20 @@ class SkillSerializer(FlexFieldsModelSerializer):
 
 class UserSettingSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.UserSetting
+        model = UserSetting
         fields = '__all__'
 
 
 class EducationSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
     class Meta:
-        model = models.Education
+        model = Education
         # fields = '__all__'
         exclude = ['student']
 
 
 class ExperienceSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
     class Meta:
-        model = models.Experience
+        model = Experience
         # fields = '__all__'
         exclude = ['student']
         expandable_fields = {
@@ -87,7 +87,7 @@ class StudentSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer
     industries = IndustrySerializer(many=True, required=False)
 
     class Meta:
-        model = models.Student
+        model = Student
         fields = '__all__'
         expandable_fields = {
             'educations': (EducationSerializer, {'many': True}),
@@ -100,13 +100,13 @@ class StudentSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer
 
 # class GroupSettingSerializer(FlexFieldsModelSerializer):
 #     class Meta:
-#         model = models.GroupSetting
+#         model = GroupSetting
 #         fields = '__all__'
 
 
 # class CompanySettingSerializer(FlexFieldsModelSerializer):
 #     class Meta:
-#         model = models.CompanySetting
+#         model = CompanySetting
 #         fields = '__all__'
 
 
@@ -115,7 +115,7 @@ class FileSerializer(FlexFieldsModelSerializer):
     lazy_thumbnail_url = serializers.ReadOnlyField()
 
     class Meta:
-        model = models.File
+        model = File
         fields = '__all__'
         read_only_fields = ['create_by']
         expandable_fields = {
@@ -137,7 +137,7 @@ class FileSerializer(FlexFieldsModelSerializer):
 
 class TagSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.Tag
+        model = Tag
         fields = '__all__'
 
 
@@ -145,7 +145,7 @@ class UserSerializer(FlexFieldsModelSerializer):
     full_name = serializers.ReadOnlyField()
 
     class Meta:
-        model = models.User
+        model = User
         exclude = ['password', 'user_permissions',
                    'is_superuser', 'groups', ]
         read_only_fields = ('id', 'is_active', 'is_staff',
@@ -172,7 +172,7 @@ class UserSerializer(FlexFieldsModelSerializer):
 
 class BlockUserSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.BlockUser
+        model = BlockUser
         deep = 1
         fields = '__all__'
         read_only_fields = ['block_at']
@@ -190,7 +190,7 @@ class SessionUserSerializer(UserSerializer):
 
 class LinkSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.Link
+        model = Link
         fields = '__all__'
         expandable_fields = {
             'user': (UserSerializer, {'many': False, }),
@@ -203,7 +203,7 @@ class GroupSerializer(FlexFieldsModelSerializer):
     # my_follow = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.Group
+        model = Group
         fields = ['id', 'name', 'slug', 'description', 'create_by',
                   'banner', 'my_info', 'create_at', 'members_count', 'posts_count']
         read_only_fields = ['members_count']
@@ -223,7 +223,7 @@ class GroupSerializer(FlexFieldsModelSerializer):
 
     def create(self, validated_data):
         invites_members = self.initial_data.pop('members', [])
-        group = models.Group.objects.create(**validated_data)
+        group = Group.objects.create(**validated_data)
         for user_group in invites_members:
             user_group['group'] = group.id
             serializer_user_group = GroupUserSerializer(data=user_group)
@@ -241,8 +241,8 @@ class GroupSerializer(FlexFieldsModelSerializer):
     # def get_my_follow(self, obj):
     #     user_request = self._get_user_request()
     #     if user_request and user_request.is_authenticated:
-    #         my_follow = models.Follow.objects.filter(
-    #             create_by=user_request, content_type=models.get_type(models.Group), object_id=obj.id).first()
+    #         my_follow = Follow.objects.filter(
+    #             create_by=user_request, content_type=get_type(Group), object_id=obj.id).first()
     #         if my_follow:
     #             return FollowSerializer(my_follow, fields=['id']).data
 
@@ -251,7 +251,7 @@ class GroupUserSerializer(FlexFieldsModelSerializer):
     # user = UserSerializer( many=False, fields=['id', 'location', 'full_name', 'username', 'avatar'])
 
     class Meta:
-        model = models.GroupUser
+        model = GroupUser
         fields = '__all__'
         expandable_fields = {
             'user': (UserSerializer, {'many': False, }),
@@ -264,7 +264,7 @@ class CommentChildrenSerializer(serializers.ModelSerializer):
         many=False, fields=['id', 'full_name', 'username', 'avatar'], read_only=True)
 
     class Meta:
-        model = models.Comment
+        model = Comment
         fields = '__all__'
 
 
@@ -272,7 +272,7 @@ class CommentSerializer(FlexFieldsModelSerializer):
     # my_reaction = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.Comment
+        model = Comment
         fields = '__all__'
         expandable_fields = {
             'create_by': (UserSerializer, {'many': False})
@@ -289,7 +289,7 @@ class CommentSerializer(FlexFieldsModelSerializer):
 
 class ApprovalPostSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = models.Approval
+        model = Approval
         fields = '__all__'
         read_only_fields = ['create_at']
 
@@ -298,7 +298,7 @@ class AttachPostSerializer(FlexFieldsModelSerializer,):
     content_object = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.AttachPost
+        model = AttachPost
         fields = '__all__'
         expandable_fields = {
             'post': ('vjit_network.api.PostSerializer', {'many': False}),
@@ -308,12 +308,12 @@ class AttachPostSerializer(FlexFieldsModelSerializer,):
         _request = None
         if 'request' in self.context:
             _request = self.context.get('request', None)
-        if isinstance(obj.content_object, models.File):
+        if isinstance(obj.content_object, File):
             return {
                 'type': 'file',
                 'data': FileSerializer(obj.content_object, fields=['id', 'mimetype', 'raw', 'thumbnails', 'name', 'create_at', 'lazy_thumbnail_url', 'size'], context={'request': _request}).data
             }
-        elif isinstance(obj.content_object, models.Link):
+        elif isinstance(obj.content_object, Link):
             return {
                 'type': 'link',
                 'data': LinkSerializer(obj.content_object, fields=['id', 'picture', 'title', 'description', 'name', 'link'], context={'request': _request}).data
@@ -323,7 +323,7 @@ class AttachPostSerializer(FlexFieldsModelSerializer,):
 class CompanySerializer(FlexFieldsModelSerializer):
 
     class Meta:
-        model = models.Company
+        model = Company
         fields = '__all__'
         expandable_fields = {
             'logo': (FileSerializer, {'many': False}),
@@ -336,7 +336,7 @@ class CompanySerializer(FlexFieldsModelSerializer):
 class ViewSerializer(FlexFieldsModelSerializer):
 
     class Meta:
-        model = models.View
+        model = View
         fields = '__all__'
         expandable_fields = {
             'create_by': (UserSerializer, {'many': False})
@@ -356,7 +356,7 @@ class PostSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
         many=True, required=False, read_only=False)
 
     class Meta:
-        model = models.Post
+        model = Post
         fields = '__all__'
         read_only_fields = ['views_count', 'comments_count', 'public_code', ]
         expandable_fields = {
@@ -367,12 +367,12 @@ class PostSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
         }
 
     def get_via_object(self, obj):
-        if isinstance(obj.via_object, models.Student):
+        if isinstance(obj.via_object, Student):
             return {
                 'type': 'student',
                 'data': StudentSerializer(obj.via_object, fields=['user.id', 'user.slug', ], expand=['user']).data
             }
-        elif isinstance(obj.via_object, models.Company):
+        elif isinstance(obj.via_object, Company):
             return {
                 'type': 'company',
                 'data': CompanySerializer(obj.via_object, fields=['id', 'name', 'slug', ]).data
@@ -394,13 +394,13 @@ class PostSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
 
 class NotificationTemplateLocalizationSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = apimodels.NotificationTemplateLocalization
+        model = NotificationTemplateLocalization
         fields = '__all__'
 
 
 class NotificationTemplateSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = apimodels.NotificationTemplate
+        model = NotificationTemplate
         fields = '__all__'
         expandable_fields = {
             'localizations': (NotificationTemplateLocalizationSerializer, {'many': True})
@@ -409,7 +409,7 @@ class NotificationTemplateSerializer(FlexFieldsModelSerializer):
 
 class NotificationSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = apimodels.Notification
+        model = Notification
         fields = '__all__'
         expandable_fields = {
             'template': (NotificationTemplateSerializer, {'many': False}),
@@ -421,7 +421,7 @@ class UserNotificationSerializer(FlexFieldsModelSerializer):
     payload = serializers.SerializerMethodField()
 
     class Meta:
-        model = apimodels.UserNotification
+        model = UserNotification
         fields = '__all__'
         expandable_fields = {
             'notification': (NotificationSerializer, {'many': False}),
@@ -437,7 +437,7 @@ class UserNotificationSerializer(FlexFieldsModelSerializer):
 
 class DeviceSerializer(FlexFieldsModelSerializer):
     class Meta:
-        model = apimodels.Device
+        model = Device
         fields = '__all__'
         expandable_fields = {
             'create_by': (UserSerializer, {'many': False})
@@ -461,6 +461,7 @@ class AuthUserSerializer(serializers.ModelSerializer):
         model = Token
         fields = '__all__'
 
+
 class ForgotTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Token
@@ -473,12 +474,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = models.User
+        model = User
         fields = ('id', 'username', 'email',
                   'password', 'first_name', 'last_name')
 
     def validate_email(self, value):
-        user = models.User.objects.filter(email=value)
+        user = User.objects.filter(email=value)
         if user.exists():
             raise serializers.ValidationError("Email is already taken")
         return BaseUserManager.normalize_email(value)
@@ -513,13 +514,13 @@ class EmptySerializer(serializers.Serializer):
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Contact
+        model = Contact
         fields = '__all__'
 
 
 class VerificationCodeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.VerificationCode
+        model = VerificationCode
         fields = '__all__'
 
 
@@ -535,7 +536,7 @@ class VerificationOTPSerializer(serializers.Serializer):
     def validate(self, attrs):
         otp_obj = None
         try:
-            otp_obj = models.VerificationCode.objects.get(**attrs)
+            otp_obj = VerificationCode.objects.get(**attrs)
         except ObjectDoesNotExist as exc:
             raise serializers.ValidationError(
                 'otp is invalid')
@@ -547,13 +548,14 @@ class VerificationOTPSerializer(serializers.Serializer):
     def save(self, **kwargs):
         user = self.validated_data.get('user')
         code = self.validated_data.get('code')
-        otp_obj = models.VerificationCode.objects.get(
+        otp_obj = VerificationCode.objects.get(
             user=user,
             code=code
         )
         otp_obj.is_enable = False
         otp_obj.save()
         return otp_obj
+
 
 class PasswordRenewSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)

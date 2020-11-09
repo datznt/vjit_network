@@ -1,5 +1,5 @@
 from django.db.models import QuerySet
-from vjit_network.core import models
+from vjit_network.core.models import Student
 from typing import List, TypeVar, Generic
 import pandas as pd
 
@@ -77,7 +77,7 @@ def dump_student_to_xlsx(queryset: QuerySet):
         start_year = None
         end_year = None
 
-        education: models.Education = student.educations.first()
+        education: Education = student.educations.first()
 
         if education:
             school_name = education.school_name

@@ -3,7 +3,8 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-from vjit_network.core import models, utils
+from vjit_network.core import utils
+from vjit_network.core.models import File, User, Comment, View, Group, GroupUser, Link , Approval, Post, Company
 from vjit_network.api import utils as rutils
 
 import mimetypes
@@ -11,7 +12,7 @@ import os
 import shutil
 
 
-@receiver(post_save, sender=models.File)
+@receiver(post_save, sender=File)
 def file_on_post_create(sender, instance, created, **kwargs):
     if created:
         dimensions = settings.THUMBNAIL_DIMENTIONS
@@ -23,8 +24,8 @@ def file_on_post_create(sender, instance, created, **kwargs):
         instance.save()
 
 
-@receiver(pre_save, sender=models.File)
-def file_on_pre_save(sender, instance: models.File, raw, **kwargs):
+@receiver(pre_save, sender=File)
+def file_on_pre_save(sender, instance: File, raw, **kwargs):
     if instance.raw:
         if not instance.name and instance.raw.name:
             instance.name = instance.raw.name
@@ -34,7 +35,7 @@ def file_on_pre_save(sender, instance: models.File, raw, **kwargs):
             instance.mimetype = instance.raw.file.content_type
 
 
-@receiver(post_delete, sender=models.File)
+@receiver(post_delete, sender=File)
 def file_on_post_detete(sender, instance, **kwargs):
     try:
         storage = instance.raw.storage
@@ -49,26 +50,26 @@ def file_on_post_detete(sender, instance, **kwargs):
         # storage.delete(path_need_delete_os)
 
 
-@receiver(post_save, sender=models.User)
+@receiver(post_save, sender=User)
 def user_create_or_update(sender, created, instance, **kwargs):
     if created:
-        models.UserSetting.objects.get_or_create(user=instance)
+        UserSetting.objects.get_or_create(user=instance)
         if instance.is_student:
-            models.Student.objects.get_or_create(user=instance)
+            Student.objects.get_or_create(user=instance)
         elif instance.is_company:
-            models.Company.objects.get_or_create(user=instance)
+            Company.objects.get_or_create(user=instance)
 
 
-@receiver(pre_save, sender=models.User)
-def user_on_pre_save(sender, instance: models.User, raw, **kwargs):
+@receiver(pre_save, sender=User)
+def user_on_pre_save(sender, instance: User, raw, **kwargs):
     pass
     # if not instance.slug:
     #     instance.slug = instance._get_unique_slug()
 
 
-@receiver(post_delete, sender=models.Comment)
+@receiver(post_delete, sender=Comment)
 def comment_on_delete(sender, instance, **kwargs):
-    if instance.content_object and isinstance(instance.content_object, models.Post):
+    if instance.content_object and isinstance(instance.content_object, Post):
         try:
             if not instance.parent:
                 instance.content_object.update_summary()
@@ -80,10 +81,10 @@ def comment_on_delete(sender, instance, **kwargs):
             pass
 
 
-@receiver(post_save, sender=models.Comment)
+@receiver(post_save, sender=Comment)
 def comment_on_create_or_update(sender, created, instance, **kwargs):
     if created:
-        if instance.content_object and isinstance(instance.content_object, models.Post):
+        if instance.content_object and isinstance(instance.content_object, Post):
             if not instance.parent:
                 instance.content_object.update_summary()
                 instance.content_object.save()
@@ -92,55 +93,55 @@ def comment_on_create_or_update(sender, created, instance, **kwargs):
                 instance.parent.save()
 
 
-@receiver(post_delete, sender=models.View)
+@receiver(post_delete, sender=View)
 def view_on_delete(sender, instance, **kwargs):
     if instance.post:
         instance.post.update_summary()
         instance.post.save()
 
 
-@receiver(post_save, sender=models.View)
+@receiver(post_save, sender=View)
 def view_on_create_or_update(sender, created, instance, **kwargs):
     if created and instance.post:
         instance.post.update_summary()
         instance.post.save()
 
 
-@receiver(post_delete, sender=models.GroupUser)
+@receiver(post_delete, sender=GroupUser)
 def groupuser_on_delete(sender, instance, **kwargs):
     if instance.group:
         instance.group.update_summary()
         instance.group.save()
 
 
-@receiver(post_save, sender=models.GroupUser)
+@receiver(post_save, sender=GroupUser)
 def groupuser_on_create_or_update(sender, created, instance, **kwargs):
     if instance.group:
         instance.group.update_summary()
         instance.group.save()
 
 
-@receiver(post_save, sender=models.Approval)
+@receiver(post_save, sender=Approval)
 def approval_on_create_or_update(sender, created, instance, **kwargs):
     instance.update_public_code()
 
-@receiver(post_delete, sender=models.Approval)
+@receiver(post_delete, sender=Approval)
 def approval_on_delete(sender, instance, **kwargs):
     pass
 
-@receiver(post_delete, sender=models.Post)
+@receiver(post_delete, sender=Post)
 def post_on_delete(sender, instance, **kwargs):
     if instance.group:
         instance.group.update_summary()
         instance.group.save()
 
-@receiver(post_save, sender=models.Post)
+@receiver(post_save, sender=Post)
 def post_on_create_or_update(sender, created, instance, **kwargs):
     if instance.group:
         instance.group.update_summary()
         instance.group.save()
 
-@receiver(pre_save, sender=models.Link)
+@receiver(pre_save, sender=Link)
 def link_on_pre_save(sender, instance, **kwargs):
     extraction = rutils.extraction_link(instance.link)
     instance.title = extraction['title']

@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group as DjangoGroup
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from django.contrib.contenttypes.models import ContentType
-from vjit_network.core import models
+from vjit_network.api.models import Notification, NotificationSetting, UserNotification, NotificationTemplate, NotificationTemplateLocalization, Device
 # Register your models here.
 
 
@@ -13,7 +13,7 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ('user', 'device', 'country_code')
 
     class notification_setting_inline(admin.StackedInline):
-        model = models.NotificationSetting
+        model = NotificationSetting
         # fields = ('id', 'can_approve_members', 'can_post_in_group',
         #           'can_approve_posts', 'allow_other_system_see_info')
         readonly_fields = ('id',)
@@ -29,7 +29,7 @@ class NotificationTemplateAdmin(admin.ModelAdmin):
     search_fields = ('id', 'name',)
 
     class notification_template_localization_inline(admin.StackedInline):
-        model = models.NotificationTemplateLocalization
+        model = NotificationTemplateLocalization
         fields = ('id', 'language', 'title_html',
                   'title_plantext', 'content_html', 'content_plantext')
         readonly_fields = ('id',)
@@ -45,7 +45,7 @@ class NotificationAdmin(admin.ModelAdmin):
     list_per_page = 10
 
     class user_notification_inline(admin.TabularInline):
-        model = models.UserNotification
+        model = UserNotification
         fields = ('user', 'is_read')
         # readonly_fields = ('id',)
         autocomplete_fields = ('user',)
@@ -53,6 +53,6 @@ class NotificationAdmin(admin.ModelAdmin):
 
     inlines = [user_notification_inline]
 
-admin.site.register(models.Device, DeviceAdmin)
-admin.site.register(models.NotificationTemplate, NotificationTemplateAdmin)
-admin.site.register(models.Notification,NotificationAdmin)
+admin.site.register(Device, DeviceAdmin)
+admin.site.register(NotificationTemplate, NotificationTemplateAdmin)
+admin.site.register(Notification,NotificationAdmin)

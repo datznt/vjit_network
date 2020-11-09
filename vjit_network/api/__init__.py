@@ -1,1 +1,1 @@
-default_app_config='vjit_network.api.apps.RestapiConfig'
+default_app_config='vjit_network.api.apps.ApiConfig'

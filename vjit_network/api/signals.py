@@ -3,14 +3,14 @@ from django.db.models.signals import (post_save, post_delete, pre_save)
 from django.dispatch import receiver
 from django.conf import settings
 from asgiref.sync import async_to_sync as _
-from vjit_network.core import models
-from vjit_network.api import models as apimodels
+from vjit_network.core.models import Comment, Post 
+from vjit_network.api.models import UserNotification, Notification, NotificationTemplate
 from vjit_network.api import serializers
 from onesignal import OneSignal, DeviceNotification
 
 notify = OneSignal(settings.ONESIGNAL_APP_ID, settings.ONESIGNAL_REST_API_KEY)
 
-@receiver(post_save, sender=apimodels.UserNotification)
+@receiver(post_save, sender=UserNotification)
 def user_notification_on_post_create(sender, instance, created, **kwargs):
     if created:
         # render template
@@ -39,9 +39,9 @@ def user_notification_on_post_create(sender, instance, created, **kwargs):
             notify.send(notification)
 
 
-@receiver(post_save, sender=models.Comment)
+@receiver(post_save, sender=Comment)
 def comment_on_create_or_update(sender, instance, created, **kwargs):
-    if created and instance.content_object and isinstance(instance.content_object, models.Post):
+    if created and instance.content_object and isinstance(instance.content_object, Post):
         if instance.parent is None:
             notification_recipient = instance.content_object.create_by
         else:
@@ -49,40 +49,40 @@ def comment_on_create_or_update(sender, instance, created, **kwargs):
         if notification_recipient == instance.create_by:
             return
         if instance.parent is None:
-            new_notification = apimodels.Notification.objects.create(
+            new_notification = Notification.objects.create(
                 actor=instance.create_by,
-                template=apimodels.NotificationTemplate.objects.get(pk=4),
+                template=NotificationTemplate.objects.get(pk=4),
                 payload=serializers.CommentSerializer(
                     instance, fields=['id', 'content', 'object_id']
                 ).data
             )
         else:
-            new_notification = apimodels.Notification.objects.create(
+            new_notification = Notification.objects.create(
                 actor=instance.create_by,
-                template=apimodels.NotificationTemplate.objects.get(pk=5),
+                template=NotificationTemplate.objects.get(pk=5),
                 payload=serializers.CommentSerializer(
                     instance, fields=['id', 'content', 'object_id', 'parent']
                 ).data
             )
-        apimodels.UserNotification.objects.create(
+        UserNotification.objects.create(
             user=notification_recipient,
             notification=new_notification
         )
 
 
-@receiver(pre_save, sender=models.Post)
+@receiver(pre_save, sender=Post)
 def post_on_pre_save(sender, instance, raw, **kwargs):
     instance.update_fields = []
     # inject update_fields to instance send to post_save
     if not instance._state.adding:
         # instance in updating
-        origin = models.Post.objects.get(id=instance.id)
+        origin = Post.objects.get(id=instance.id)
         is_public_code_changed = origin.public_code != instance.public_code
         if is_public_code_changed:
             instance.update_fields.append('public_code')
 
 
-@receiver(post_save, sender=models.Post)
+@receiver(post_save, sender=Post)
 def post_on_create_or_update(sender, instance, created, **kwargs):
     post_fields = {
         'fields': ['id', 'content', 'icon', 'title',
@@ -90,46 +90,46 @@ def post_on_create_or_update(sender, instance, created, **kwargs):
         'expand': ['group']
     }
     if created:
-        if instance.public_code == models.Post.PublicCode.WAITING:
-            apimodels.UserNotification.objects.create(
+        if instance.public_code == Post.PublicCode.WAITING:
+            UserNotification.objects.create(
                 user=instance.group.create_by,
-                notification=apimodels.Notification.objects.create(
+                notification=Notification.objects.create(
                     actor=instance.create_by,
-                    template=apimodels.NotificationTemplate.objects.get(pk=7),
+                    template=NotificationTemplate.objects.get(pk=7),
                     payload=serializers.PostSerializer(
                         instance, **post_fields).data
                 )
             )
     else:
         if "public_code" in instance.update_fields:
-            if instance.public_code == models.Post.PublicCode.ACCEPT:
+            if instance.public_code == Post.PublicCode.ACCEPT:
                 # send to all members in group
-                new_notification = apimodels.Notification.objects.create(
+                new_notification = Notification.objects.create(
                     actor=instance.create_by,
-                    template=apimodels.NotificationTemplate.objects.get(pk=6),
+                    template=NotificationTemplate.objects.get(pk=6),
                     payload=serializers.PostSerializer(instance, **post_fields).data
                 )
                 users_in_group = instance.group.group_members.filter(
                     is_active=True).exclude(user=instance.create_by)
-                notification_recipients = [apimodels.UserNotification(
+                notification_recipients = [UserNotification(
                     user=member.user, notification=new_notification) for member in users_in_group]
-                apimodels.UserNotification.objects.bulk_create(
+                UserNotification.objects.bulk_create(
                     notification_recipients)
                 # send to post create by
-                apimodels.UserNotification.objects.create(
+                UserNotification.objects.create(
                     user=instance.create_by,
-                    notification=apimodels.Notification.objects.create(
+                    notification=Notification.objects.create(
                         actor=instance.create_by,
-                        template=apimodels.NotificationTemplate.objects.get(pk=8),
+                        template=NotificationTemplate.objects.get(pk=8),
                         payload=serializers.PostSerializer(instance, **post_fields).data
                     )
                 )
-            elif instance.public_code == models.Post.PublicCode.WAITING:
-                apimodels.UserNotification.objects.create(
+            elif instance.public_code == Post.PublicCode.WAITING:
+                UserNotification.objects.create(
                     user=instance.create_by,
-                    notification=apimodels.Notification.objects.create(
+                    notification=Notification.objects.create(
                         actor=instance.create_by,
-                        template=apimodels.NotificationTemplate.objects.get(pk=9),
+                        template=NotificationTemplate.objects.get(pk=9),
                         payload=serializers.PostSerializer(instance, **post_fields).data
                     )
                 )
