@@ -3,24 +3,26 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-from vjit_network.core import utils
-from vjit_network.core.models import File, User, Comment, View, Group, GroupUser, Link , Approval, Post, Company
-from vjit_network.api import utils as rutils
+from vjit_network.core.utils import create_thumbnail, save_thumbnails
+from vjit_network.core.models import File, User, Comment, View, Group, GroupUser, Link, Approval, Post, Company, UserSetting, Student
+from vjit_network.api.utils import extraction_link
 
 import mimetypes
 import os
 import shutil
 
+THUMBNAIL_DIMENTIONS = settings.THUMBNAIL_DIMENTIONS
+
 
 @receiver(post_save, sender=File)
 def file_on_post_create(sender, instance, created, **kwargs):
     if created:
-        dimensions = settings.THUMBNAIL_DIMENTIONS
-        has_thumb, thumb, file_type = utils.create_thumbnail(
+        dimensions = THUMBNAIL_DIMENTIONS
+        has_thumb, thumb, file_type = create_thumbnail(
             instance.raw, instance.raw.storage, dimensions)
         if not has_thumb and not thumb:
             return
-        instance.thumbnails = utils.save_thumbnails(thumb, instance, file_type)
+        instance.thumbnails = save_thumbnails(thumb, instance, file_type)
         instance.save()
 
 
@@ -125,9 +127,11 @@ def groupuser_on_create_or_update(sender, created, instance, **kwargs):
 def approval_on_create_or_update(sender, created, instance, **kwargs):
     instance.update_public_code()
 
+
 @receiver(post_delete, sender=Approval)
 def approval_on_delete(sender, instance, **kwargs):
     pass
+
 
 @receiver(post_delete, sender=Post)
 def post_on_delete(sender, instance, **kwargs):
@@ -135,15 +139,17 @@ def post_on_delete(sender, instance, **kwargs):
         instance.group.update_summary()
         instance.group.save()
 
+
 @receiver(post_save, sender=Post)
 def post_on_create_or_update(sender, created, instance, **kwargs):
     if instance.group:
         instance.group.update_summary()
         instance.group.save()
 
+
 @receiver(pre_save, sender=Link)
 def link_on_pre_save(sender, instance, **kwargs):
-    extraction = rutils.extraction_link(instance.link)
+    extraction = extraction_link(instance.link)
     instance.title = extraction['title']
     instance.description = extraction['description']
     instance.picture = extraction['picture']

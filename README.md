@@ -26,7 +26,7 @@ mở browser nhập **[www.mysite.local:8000](http://www.mysite.local:8000/)** :
  ### thêm một ngôn ngữ mới
  1. chạy script:
      ```
-     python manage.py makemessages -l vi
+     python manage.py makemessages -l vi -i env
      ```
      **vi** là [language code](http://www.lingoes.net/en/translator/langcode.htm)\
      **[vi/LC_MESSAGES/django.po](locale/vi/LC_MESSAGES/django.po)** sẽ được tạo ra trong **[locale](locale/)**

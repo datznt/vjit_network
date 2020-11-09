@@ -34,8 +34,6 @@ def reverse(view, urlconf=None, args=None, kwargs=None, current_app=None, query_
     '''
     base_url = base_reverse(view, urlconf=urlconf, args=args,
                             kwargs=kwargs, current_app=current_app)
-    # default_site_settings = Site.objects.get_current()
-    # base_url = default_site_settings.domain + base_url
     if query_kwargs:
         return '{}?{}'.format(base_url, urlencode(query_kwargs))
     return base_url

@@ -39,14 +39,6 @@ class IndustrySerializer(FlexFieldsModelSerializer):
         fields = '__all__'
 
 
-# class AddressSerializer(FlexFieldsModelSerializer):
-#     label = serializers.ReadOnlyField()
-
-#     class Meta:
-#         model = Address
-#         fields = '__all__'
-
-
 class SkillSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Skill
@@ -97,17 +89,6 @@ class StudentSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer
             'user': ('vjit_network.api.UserSerializer', {'many': False, }),
             'industries': ('vjit_network.api.IndustrySerializer', {'many': True, }),
         }
-
-# class GroupSettingSerializer(FlexFieldsModelSerializer):
-#     class Meta:
-#         model = GroupSetting
-#         fields = '__all__'
-
-
-# class CompanySettingSerializer(FlexFieldsModelSerializer):
-#     class Meta:
-#         model = CompanySetting
-#         fields = '__all__'
 
 
 class FileSerializer(FlexFieldsModelSerializer):
@@ -238,17 +219,8 @@ class GroupSerializer(FlexFieldsModelSerializer):
             if group_user:
                 return GroupUserSerializer(group_user, omit=["group"]).data
 
-    # def get_my_follow(self, obj):
-    #     user_request = self._get_user_request()
-    #     if user_request and user_request.is_authenticated:
-    #         my_follow = Follow.objects.filter(
-    #             create_by=user_request, content_type=get_type(Group), object_id=obj.id).first()
-    #         if my_follow:
-    #             return FollowSerializer(my_follow, fields=['id']).data
-
 
 class GroupUserSerializer(FlexFieldsModelSerializer):
-    # user = UserSerializer( many=False, fields=['id', 'location', 'full_name', 'username', 'avatar'])
 
     class Meta:
         model = GroupUser
@@ -277,14 +249,6 @@ class CommentSerializer(FlexFieldsModelSerializer):
         expandable_fields = {
             'create_by': (UserSerializer, {'many': False})
         }
-
-    # def get_my_reaction(self, obj):
-    #     request = self.context.get('request', None)
-    #     if request and hasattr(request, 'user'):
-    #         user_req = request.user
-    #         my_reaction = obj.reacts.filter(create_by=user_req).first()
-    #         if my_reaction:
-    #             return ReactSerializer(my_reaction, fields=['id', 'create_at', 'react_type']).data
 
 
 class ApprovalPostSerializer(FlexFieldsModelSerializer):
@@ -448,14 +412,10 @@ class UserLoginSerializer(serializers.Serializer):
 
     username = serializers.CharField()
     password = serializers.CharField()
-    # class Meta:
-    #     model = User
-    #     fields = ['username','password']
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False)
-    # key = serializers.CharField(source='key')
 
     class Meta:
         model = Token

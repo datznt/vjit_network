@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext as _
 from django.db.models import Value
 from django.db.models.functions import Concat
@@ -14,11 +15,12 @@ from django.urls import path
 from django.shortcuts import render
 from grappelli.dashboard import modules, Dashboard
 from import_export.admin import ImportMixin, ImportExportActionModelAdmin
-from io import BytesIO
+from rest_framework.authtoken.models import Token
 
 from vjit_network.core import utils, customfields, resources, business, forms
 from vjit_network.core.models import Post, File, Company, Comment, View, Industry, Tag, Skill, Link, User, Student, Group, GroupUser, Contact, get_type, UserSetting, AttachPost, Approval, Experience, Education
 
+from io import BytesIO
 import pandas as pd
 
 # Register your models here
@@ -427,6 +429,8 @@ class ContactAdmin(ModelAdmin):
     date_hierarchy = "create_at"
 
 
+admin.site.unregister(Site)
+admin.site.unregister(Token)
 admin.site.register(Post, PostAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(Company, CompanyAdmin)
@@ -435,7 +439,7 @@ admin.site.register(View, ViewAdmin)
 admin.site.register(Industry)
 admin.site.register(Tag)
 admin.site.register(Skill)
-admin.site.register(ContentType, ContentTypeAdmin)
+# admin.site.register(ContentType, ContentTypeAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Student, StudentAdmin)

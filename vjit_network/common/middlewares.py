@@ -1,10 +1,10 @@
+from django.utils import translation
+from django.utils.deprecation import MiddlewareMixin
+from django.conf import settings
+
+DEFAULT_LANGUAGE = settings.LANGUAGE_CODE
+
 import os
-
-try:
-    from django.utils.deprecation import MiddlewareMixin
-except ImportError:  # django < 1.10
-    MiddlewareMixin = object
-
 
 class RangesMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
@@ -30,5 +30,21 @@ class RangesMiddleware(MiddlewareMixin):
         f.read = lambda n: old_read(min(n, end + 1 - f.tell()))
         response.status_code = 206
         response['Content-Length'] = end + 1 - start
-        response['Content-Range'] = 'bytes %d-%d/%d' % (start, end, statobj.st_size)
+        response['Content-Range'] = 'bytes %d-%d/%d' % (
+            start, end, statobj.st_size)
         return response
+
+class UserSettingMiddleware(MiddlewareMixin):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user_resq = request.user
+        active_language = DEFAULT_LANGUAGE
+        if user_resq.is_authenticated and user_resq.is_active and hasattr(user_resq, 'usersetting'):
+            user_setting = user_resq.usersetting
+            if user_setting:
+                active_language = user_setting.language        
+        request.session[translation.LANGUAGE_SESSION_KEY] = active_language
+        translation.activate(active_language)
+        return self.get_response(request)

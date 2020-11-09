@@ -16,14 +16,13 @@ from django.forms import ValidationError
 from django.contrib.sites.models import Site
 from phonenumber_field.modelfields import PhoneNumberField
 from autoslug import AutoSlugField
-# from address.models import AddressField
 from urllib.parse import urljoin
 from safedelete.models import SafeDeleteModel
 from safedelete.models import SOFT_DELETE
 from ckeditor.fields import RichTextField
-from vjit_network.core.customfields import JSONSchemaField
-from vjit_network.core import manager
 
+from vjit_network.core import manager, customfields, utils
+from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel
 
 import json
 import uuid
@@ -52,7 +51,7 @@ class Tag(models.Model):
         return self.name
 
 
-class File(models.Model):
+class File(UUIDPrimaryModel, CreateAtModel):
     def directory_path(self):
         """
         0:  user id
@@ -68,17 +67,18 @@ class File(models.Model):
     def thumbnail_directory_path(self, filename):
         return os.path.join(self.directory_path(), 'thumbnails', filename)
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     create_by = models.ForeignKey(
-        verbose_name=_('Create by'), to='User', on_delete=models.CASCADE, related_name='files', default=None,
+        verbose_name=_('Create by'),
+        to='User',
+        on_delete=models.CASCADE,
+        related_name='files',
+        default=None,
         help_text=_("Account to upload this file")
     )
-    create_at = models.DateTimeField(
-        verbose_name=_('Create at'), auto_now_add=True,
-        help_text=_("Specify file upload time")
-    )
     name = models.CharField(
-        verbose_name=_('File name'), max_length=255, null=True, blank=True, default=None,
+        verbose_name=_('File name'),
+        max_length=255,
+        null=True, blank=True, default=None,
         help_text=_("The name of the file")
     )
     size = models.BigIntegerField(
@@ -129,7 +129,7 @@ class File(models.Model):
         return self.name
 
 
-class User(AbstractUser):
+class User(BigIntPrimary, AbstractUser):
     MALE = "male"
     FEMALE = "female"
     UNKNOWN = 'unknown'
@@ -138,14 +138,15 @@ class User(AbstractUser):
         (FEMALE, _("Female")),
         (UNKNOWN, _("Unknown")),
     ]
-    id = models.BigAutoField(primary_key=True)
     avatar = models.OneToOneField(
+        verbose_name=_('Avatar'),
         to=File,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     slug = AutoSlugField(
+        verbose_name=_('Slug'),
         populate_from='username',
         unique_with=['username'],
         unique=True,
@@ -159,12 +160,15 @@ class User(AbstractUser):
         default=UNKNOWN,
     )
     is_online = models.BooleanField(
+        verbose_name=_('Is online'),
         default=False
     )
     is_student = models.BooleanField(
+        verbose_name=_('Is student'),
         default=False
     )
     is_company = models.BooleanField(
+        verbose_name=_('Is company'),
         default=False
     )
     objects = manager.UserManager()
@@ -184,12 +188,7 @@ class User(AbstractUser):
         return "user_%s" % self.id
 
 
-class BlockUser(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+class BlockUser(UUIDPrimaryModel):
     create_by = models.ForeignKey(
         verbose_name=_('Blocker'),
         to=User,
@@ -226,10 +225,10 @@ class BlockUser(models.Model):
 
 class O2OUser(models.Model):
     user = models.OneToOneField(
-        User,
+        verbose_name=_('User'),
+        to=User,
         on_delete=models.CASCADE,
         primary_key=True,
-        # default=None
     )
 
     class Meta:
@@ -241,10 +240,12 @@ class VerificationCode(O2OUser):
         verbose_name=_('Code OTP')
     )
     expired_time = models.DateTimeField(
+        verbose_name=_('Expired time'),
         null=False,
         blank=False
     )
     is_enable = models.BooleanField(
+        verbose_name=_('Is enable'),
         default=True
     )
 
@@ -252,34 +253,36 @@ class VerificationCode(O2OUser):
         return str(self.code)
 
 
-class Link(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class Link(BigIntPrimary, CreateAtModel):
     create_by = models.ForeignKey(
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         related_name='links',
     )
-    create_at = models.DateTimeField(
-        auto_now_add=True
-    )
     description = models.TextField(
+        verbose_name=_('Description'),
         null=True,
         blank=True
     )
     link = models.URLField(
+        verbose_name=_('Link url'),
         max_length=255
     )
     title = models.CharField(
+        verbose_name=_('Title'),
         null=True,
         blank=True,
         max_length=255
     )
     name = models.CharField(
+        verbose_name=_('Link name'),
         null=True,
         blank=True,
         max_length=100
     )
     picture = models.URLField(
+        verbose_name=_('Link picture'),
         max_length=500,
         null=True,
         blank=True
@@ -290,9 +293,6 @@ class Link(models.Model):
 
 
 class UserSetting(O2OUser):
-    # user = models.OneToOneField(
-    #     User
-    # )
     language = models.CharField(
         verbose_name=_('Language'),
         max_length=2, default='vi',
@@ -304,21 +304,18 @@ class UserSetting(O2OUser):
         verbose_name_plural = _('User settings')
 
 
-class Skill(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class Skill(BigIntPrimary, CreateAtModel):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
         default=None,
     )
     create_by = models.ForeignKey(
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         null=True, blank=True,
         related_name='skills_created',
-    )
-    create_at = models.DateTimeField(
-        auto_now_add=True,
     )
 
     class Meta:
@@ -338,14 +335,17 @@ class Student(O2OUser):
     """
 
     phone = PhoneNumberField(
+        verbose_name=_('Phone number'),
         null=True,
         blank=True
     )
     birth_date = models.DateField(
+        verbose_name=_('Birth date'),
         null=True,
         blank=True
     )
     address = models.CharField(
+        verbose_name=_('Address'),
         max_length=255,
         null=True,
         blank=True
@@ -387,11 +387,9 @@ class Student(O2OUser):
                 "user__email__icontains",)
 
 
-class Experience(models.Model):
-    id = models.BigAutoField(
-        primary_key=True
-    )
+class Experience(BigIntPrimary):
     student = models.ForeignKey(
+        verbose_name=_('Student'),
         to=Student,
         on_delete=models.CASCADE,
         related_name='experiences'
@@ -402,6 +400,7 @@ class Experience(models.Model):
         default=None,
     )
     employment_type = models.CharField(
+        verbose_name=_('Employment type'),
         max_length=10,
         default=None,
         null=True,
@@ -414,7 +413,8 @@ class Experience(models.Model):
         default=None,
     )
     company_lookup = models.ForeignKey(
-        'Company',
+        verbose_name=_('Company lookup'),
+        to='Company',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -452,15 +452,13 @@ class Experience(models.Model):
         ordering = ['the_order']
 
 
-class Education(models.Model):
+class Education(BigIntPrimary, models.Model):
     START_YEAR_CHOICES = list(
         reversed([(r, r) for r in range(1900, datetime.now().year+1)]))
     END_YEAR_CHOICES = list(
         reversed([(r, r) for r in range(1900, datetime.now().year+8)]))
-    id = models.BigAutoField(
-        primary_key=True
-    )
     student = models.ForeignKey(
+        verbose_name=_('Student'),
         to=Student,
         on_delete=models.CASCADE,
         related_name='educations'
@@ -494,11 +492,13 @@ class Education(models.Model):
         choices=END_YEAR_CHOICES
     )
     class_id = models.CharField(
+        verbose_name=_('Class id'),
         max_length=10,
         null=True,
         blank=True
     )
     student_code = models.CharField(
+        verbose_name=_('Student code'),
         max_length=10,
         null=True,
         blank=True
@@ -515,16 +515,18 @@ class Education(models.Model):
     )
 
 
-class GroupUser(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class GroupUser(BigIntPrimary):
     user = models.ForeignKey(
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         related_name='group_members',
         default=None,
     )
     group = models.ForeignKey(
-        to='Group', on_delete=models.CASCADE,
+        verbose_name=_('Group'),
+        to='Group',
+        on_delete=models.CASCADE,
         related_name='group_members',
         default=None,
     )
@@ -542,33 +544,34 @@ class GroupUser(models.Model):
         verbose_name_plural = _('Join the groups')
 
 
-class Group(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class Group(BigIntPrimary, CreateAtModel):
     create_by = models.ForeignKey(
+        verbose_name=_('Group'),
         to=User,
         on_delete=models.CASCADE,
         related_name='admin_groups',
         default=None,
     )
-    create_at = models.DateTimeField(
-        auto_now_add=True,
-    )
     banner = models.OneToOneField(
+        verbose_name=_('Banner'),
         to=File,
         on_delete=models.SET_NULL,
         null=True, blank=True
     )
     name = models.CharField(
+        verbose_name=_('Name'),
         max_length=200,
         default=None,
     )
     slug = AutoSlugField(
+        verbose_name=_('Slug'),
         populate_from='name',
         unique_with=['name'],
         unique=True,
         editable=True
     )
     description = RichTextField(
+        verbose_name=_('Description'),
         null=True,
         blank=True,
     )
@@ -579,12 +582,14 @@ class Group(models.Model):
         related_name='join_groups',
     )
     members_count = models.IntegerField(
+        verbose_name=_('Members count'),
         default=0,
     )
     posts_count = models.IntegerField(
+        verbose_name=_('Posts count'),
         default=0,
     )
-    # summary = JSONSchemaField(
+    # summary = customfields.JSONSchemaField(
     #     schema='schemas/group.summary.json', default=dict, blank=True)
 
     class Meta:
@@ -615,18 +620,16 @@ class Group(models.Model):
         return self.name
 
 
-class View(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class View(BigIntPrimary, CreateAtModel):
     create_by = models.ForeignKey(
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         related_name='views',
         default=None,
     )
-    create_at = models.DateTimeField(
-        auto_now_add=True,
-    )
     post = models.ForeignKey(
+        verbose_name=_('Post'),
         to='Post',
         on_delete=models.CASCADE,
         related_name='views',
@@ -638,25 +641,24 @@ class View(models.Model):
         unique_together = ('create_by', 'post')
 
 
-class Comment(models.Model):
+class Comment(BigIntPrimary, CreateAtModel):
     limit = models.Q(app_label='core', model='post')
-    id = models.BigAutoField(primary_key=True)
     create_by = models.ForeignKey(
-        verbose_name=_('Create by'),
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         related_name='comments',
         default=None,
     )
-    create_at = models.DateTimeField(
-        auto_now_add=True,
-    )
     content_type = models.ForeignKey(
+        verbose_name=_('Content type'),
         to=ContentType,
         limit_choices_to=limit,
         on_delete=models.CASCADE,
     )
-    object_id = models.BigIntegerField()
+    object_id = models.BigIntegerField(
+        verbose_name=_('Object id'),
+    )
     content_object = GenericForeignKey(
         ct_field='content_type',
         fk_field='object_id'
@@ -675,10 +677,9 @@ class Comment(models.Model):
         help_text=_('Content of the comment')
     )
     replies_count = models.IntegerField(
+        verbose_name=_('Replies count'),
         default=0
     )
-    # summary = JSONSchemaField(
-    #     schema='schemas/comment.summary.json', default=dict, blank=True)
 
     class Meta:
         verbose_name = _('Comment')
@@ -704,7 +705,7 @@ class Industry(models.Model):
         return self.name
 
 
-class Company(O2OUser):
+class Company(O2OUser, CreateAtModel):
     PUBLIC_COMPANY = 'PC'
     SELFT_EMPLOYED = 'SE'
     GOVERMENT_AGENCY = 'GA'
@@ -720,25 +721,26 @@ class Company(O2OUser):
         (PRIVATELY_HELD, _('Privately Held')),
         (PARTNERSHIP, _('Partnership'))
     ]
-    create_at = models.DateTimeField(
-        auto_now_add=True,
-    )
     logo = models.OneToOneField(
+        verbose_name=_('Logo'),
         to=File,
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="companies_logo"
     )
     banner = models.OneToOneField(
+        verbose_name=_('Banner'),
         to=File,
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="companies_banner"
     )
     name = models.CharField(
+        verbose_name=_('Name'),
         max_length=140,
     )
     slug = AutoSlugField(
+        verbose_name=_('Slug'),
         populate_from='name',
         unique_with=['name'],
         unique=True,
@@ -746,11 +748,13 @@ class Company(O2OUser):
         blank=True
     )
     industry = models.ForeignKey(
+        verbose_name=_('Industry'),
         to=Industry,
         on_delete=models.SET_NULL,
         null=True, blank=True,
     )
     founded = models.IntegerField(
+        verbose_name=_('Founded'),
         default=timezone.now().year,
         validators=(MinValueValidator(
             0), MaxValueValidator(timezone.now().year)),
@@ -758,32 +762,39 @@ class Company(O2OUser):
         blank=True
     )
     overview = RichTextField(
+        verbose_name=_('Overview'),
         null=True,
         blank=True,
     )
     company_type = models.CharField(
+        verbose_name=_('Company type'),
         max_length=2,
         choices=ENTERPRISE_TYPE,
         default=None,
     )
     slogan = models.CharField(
+        verbose_name=_('Slogan'),
         max_length=255,
         default=None,
         null=True,
         blank=True,
     )
     email = models.EmailField(
+        verbose_name=_('Email'),
         default=None
     )
     phone = PhoneNumberField(
+        verbose_name=_('Phone'),
         default=None
     )
     address = models.CharField(
+        verbose_name=_('Address'),
         max_length=255,
         null=True,
         blank=True
     )
     site_url = models.URLField(
+        verbose_name=_('Site url'),
         null=True,
         blank=True,
         max_length=200
@@ -811,7 +822,7 @@ class Company(O2OUser):
         )
 
 
-class Post(SafeDeleteModel):
+class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel):
 
     _safedelete_policy = SOFT_DELETE
 
@@ -825,27 +836,24 @@ class Post(SafeDeleteModel):
         WAITING = 'waiting', _('Awaiting approval')
         DISSENT = 'dissent', _('Dissent')  # admin_accept: f, user_accept: f
 
-    id = models.BigAutoField(primary_key=True)
-
     create_by = models.ForeignKey(
+        verbose_name=_('User'),
         to=User,
         on_delete=models.CASCADE,
         null=True, related_name='posts',
     )
     group = models.ForeignKey(
+        verbose_name=_('Group'),
         to=Group,
         on_delete=models.CASCADE,
         related_name='posts',
         # default=None
     )
     public_code = models.CharField(
+        verbose_name=_('Public code'),
         max_length=30,
         choices=PublicCode.choices,
         default=PublicCode.WAITING,
-    )
-    create_at = models.DateTimeField(
-        verbose_name=_('Create at'),
-        auto_now_add=True,
     )
     content = models.TextField(
         verbose_name=_('Content'),
@@ -872,9 +880,11 @@ class Post(SafeDeleteModel):
         help_text=_('Field extension of the model')
     )
     views_count = models.IntegerField(
+        verbose_name=_('Views count'),
         default=0,
     )
     comments_count = models.IntegerField(
+        verbose_name=_('Comments count'),
         default=0,
     )
     comments = GenericRelation(
@@ -916,34 +926,32 @@ class Post(SafeDeleteModel):
             return self.group.name
 
 
-class Approval(SafeDeleteModel):
+class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel):
     _safedelete_policy = SOFT_DELETE
-
-    id = models.BigAutoField(
-        primary_key=True
-    )
     user_accept = models.BooleanField(
+        verbose_name=_('User accept'),
         default=True
     )
     admin_accept = models.BooleanField(
+        verbose_name=_('Admin accept'),
         default=False
     )
     user_reason = models.TextField(
+        verbose_name=_('User reason'),
         null=True,
         blank=True,
     )
     admin_reason = models.TextField(
+        verbose_name=_('Admin reason'),
         null=True,
         blank=True,
     )
     post = models.ForeignKey(
+        verbose_name=_('Post'),
         to=Post,
         on_delete=models.CASCADE,
         default=None,
         related_name='approvals'
-    )
-    create_at = models.DateTimeField(
-        auto_now_add=True
     )
 
     class Meta:
@@ -967,10 +975,8 @@ class Approval(SafeDeleteModel):
             return _('Dissent.')
 
 
-class AttachPost(SafeDeleteModel):
+class AttachPost(BigIntPrimary, SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE
-
-    id = models.BigAutoField(primary_key=True)
     limit = models.Q(
         app_label='core', model='file') | models.Q(
         app_label='core', model='link')
@@ -1013,10 +1019,7 @@ def get_type(classes):
         return None
 
 
-class Contact(models.Model):
-    id = models.BigAutoField(
-        primary_key=True
-    )
+class Contact(BigIntPrimary, CreateAtModel):
     name = models.CharField(
         verbose_name=_('Full name'),
         max_length=255
@@ -1030,17 +1033,9 @@ class Contact(models.Model):
     content = models.TextField(
         verbose_name=_('Content'),
     )
-    create_at = models.DateTimeField(
-        auto_now_add=True
-    )
 
 
-class VisitLogger(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+class VisitLogger(UUIDPrimaryModel,):
     user = models.ForeignKey(
         verbose_name=_('User'),
         to=User,

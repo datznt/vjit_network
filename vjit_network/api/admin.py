@@ -9,13 +9,10 @@ from vjit_network.api.models import Notification, NotificationSetting, UserNotif
 
 class DeviceAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'device',)
-    # date_hierarchy = 'create_at'
     search_fields = ('user', 'device', 'country_code')
 
     class notification_setting_inline(admin.StackedInline):
         model = NotificationSetting
-        # fields = ('id', 'can_approve_members', 'can_post_in_group',
-        #           'can_approve_posts', 'allow_other_system_see_info')
         readonly_fields = ('id',)
         extra = 1
 

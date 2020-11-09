@@ -29,7 +29,6 @@ ALLOWED_HOSTS = ['*']
 SITE_ID = 1
 # Application definition
 INSTALLED_APPS = [
-    # 'admin_interface',
     'colorfield',
     'grappelli.dashboard',
     'grappelli',
@@ -48,7 +47,6 @@ INSTALLED_APPS = [
     'drf_autodocs',
     'django_filters',
     'ckeditor',
-    'channels',
     'debug_toolbar',
     'import_export',
 
@@ -64,12 +62,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'vjit_network.common.middlewares.UserSettingMiddleware'
 ]
 
 ROOT_URLCONF = 'vjit_network.urls'
@@ -98,22 +95,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vjit_network.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db3',
+        'NAME': 'vjit_network',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
@@ -154,13 +142,14 @@ AUTHENTICATION_BACKENDS = ('vjit_network.common.backends.CustomBackend',)
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
 LANGUAGES = [
     ('en', 'English'),
     ('vi',  'Tiếng Việt'),
+    ('jp',  '日本語'),
 ]
 
 USE_I18N = True
@@ -278,17 +267,6 @@ CORS_ORIGIN_WHITELIST = (
 
 THUMBNAIL_DIMENTIONS = [(100, 100), (780, 780), (1024, 1024)]
 
-# websocket
-ASGI_APPLICATION = "hutechsocial.routing.application"
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
-    },
-}
-
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
@@ -300,6 +278,7 @@ ONESINGAL_ANDROID_CHANNEL_ID = 'aae59f23-a9e4-4158-9c7a-59d6056235d2'
 
 GRAPPELLI_INDEX_DASHBOARD = {
     'django.contrib.admin.site': 'vjit_network.core.admin.MyDashboard'}
+GRAPPELLI_ADMIN_TITLE = 'VJIT Alumni'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

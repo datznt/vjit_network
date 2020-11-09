@@ -8,6 +8,7 @@ from django.contrib.postgres.fields import JSONField
 from django.template import Template, Context
 from django.contrib.sites.models import Site
 from vjit_network.core.models import UserSetting
+from vjit_network.common.models import UUIDPrimaryModel
 from ckeditor.fields import RichTextField
 
 import uuid
@@ -16,10 +17,7 @@ import json
 User = get_user_model()
 
 
-class Device(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, unique=True
-    )
+class Device(UUIDPrimaryModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, default=None, related_name='devices')
     device = models.CharField(max_length=100, null=True, blank=False)
@@ -32,10 +30,7 @@ class Device(models.Model):
         unique_together = ('user', 'player_id')
 
 
-class NotificationSetting(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, unique=True
-    )
+class NotificationSetting(UUIDPrimaryModel):
     device = models.OneToOneField(
         Device, on_delete=models.CASCADE,  default=None)
     turn_off_notification = models.BooleanField(default=False)
@@ -83,10 +78,7 @@ class NotificationTemplateLocalization(models.Model):
         unique_together = ('notification_template', 'language')
 
 
-class UserNotification(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, unique=True
-    )
+class UserNotification(UUIDPrimaryModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="notifications_user")
     notification = models.ForeignKey(
@@ -143,10 +135,7 @@ class UserNotification(models.Model):
         return data
 
 
-class Notification(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, unique=True
-    )
+class Notification(UUIDPrimaryModel):
     actor = models.ForeignKey(
         verbose_name=_('Actor'), to=User, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_actor',
         
