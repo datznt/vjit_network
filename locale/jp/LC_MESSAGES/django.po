@@ -8,11 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-10 00:26+0700\n"
+"POT-Creation-Date: 2020-11-10 18:55+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,90 +20,118 @@ msgstr ""
 msgid "System API"
 msgstr ""
 
-#: .\vjit_network\api\models.py:41 .\vjit_network\core\models.py:309
-#: .\vjit_network\core\models.py:562 .\vjit_network\core\models.py:700
-#: .\vjit_network\core\models.py:739
+#: .\vjit_network\api\models.py:31 .\vjit_network\api\models.py:32
+msgid "Devices"
+msgstr ""
+
+#: .\vjit_network\api\models.py:41
+msgid "Notification setting"
+msgstr ""
+
+#: .\vjit_network\api\models.py:42
+msgid "Notification settings"
+msgstr ""
+
+#: .\vjit_network\api\models.py:47 .\vjit_network\core\models.py:322
+#: .\vjit_network\core\models.py:580 .\vjit_network\core\models.py:721
+#: .\vjit_network\core\models.py:764
 msgid "Name"
 msgstr ""
 
-#: .\vjit_network\api\models.py:43
+#: .\vjit_network\api\models.py:49
 msgid "Image display field"
 msgstr ""
 
-#: .\vjit_network\api\models.py:45
+#: .\vjit_network\api\models.py:51
 msgid "Icon display field"
 msgstr ""
 
-#: .\vjit_network\api\models.py:47
+#: .\vjit_network\api\models.py:53
 msgid "Accent color"
 msgstr ""
 
-#: .\vjit_network\api\models.py:48
+#: .\vjit_network\api\models.py:54
 msgid ""
 "Sets the circle color around your small icon that shows to the left of your "
 "notification text. Uses ARGB Hex value (E.g. FF9900FF)."
 msgstr ""
 
-#: .\vjit_network\api\models.py:50
+#: .\vjit_network\api\models.py:56
 msgid "Launch url format"
 msgstr ""
 
-#: .\vjit_network\api\models.py:52
+#: .\vjit_network\api\models.py:58
 msgid "App url format"
 msgstr ""
 
-#: .\vjit_network\api\models.py:54
+#: .\vjit_network\api\models.py:60
 msgid "sound"
 msgstr ""
 
-#: .\vjit_network\api\models.py:55
+#: .\vjit_network\api\models.py:61
 msgid ""
 "The sound that plays when this notification is received by the device. If no "
 "sound is specified, the device's default sound will play."
 msgstr ""
 
-#: .\vjit_network\api\models.py:65 .\vjit_network\core\models.py:297
-msgid "Language"
-msgstr ""
-
-#: .\vjit_network\api\models.py:69
-msgid "Title format html"
-msgstr ""
-
-#: .\vjit_network\api\models.py:71
-msgid "Title format text"
-msgstr ""
-
-#: .\vjit_network\api\models.py:73
-msgid "Content format html"
-msgstr ""
-
-#: .\vjit_network\api\models.py:75
-msgid "Content format text"
-msgstr ""
-
-#: .\vjit_network\api\models.py:140
-msgid "Actor"
-msgstr ""
-
-#: .\vjit_network\api\models.py:144
+#: .\vjit_network\api\models.py:67 .\vjit_network\api\models.py:155
 msgid "Notification template"
 msgstr ""
 
-#: .\vjit_network\api\models.py:147
-msgid "Creation time"
+#: .\vjit_network\api\models.py:68
+msgid "Notification templates"
 msgstr ""
 
-#: .\vjit_network\api\models.py:150
-msgid "Payload"
+#: .\vjit_network\api\models.py:75 .\vjit_network\core\models.py:310
+msgid "Language"
+msgstr ""
+
+#: .\vjit_network\api\models.py:79
+msgid "Title format html"
+msgstr ""
+
+#: .\vjit_network\api\models.py:81
+msgid "Title format text"
+msgstr ""
+
+#: .\vjit_network\api\models.py:83
+msgid "Content format html"
+msgstr ""
+
+#: .\vjit_network\api\models.py:85
+msgid "Content format text"
+msgstr ""
+
+#: .\vjit_network\api\models.py:89
+msgid "Notification template localization"
+msgstr ""
+
+#: .\vjit_network\api\models.py:90
+msgid "Notification template localizations"
 msgstr ""
 
 #: .\vjit_network\api\models.py:151
+msgid "Actor"
+msgstr ""
+
+#: .\vjit_network\api\models.py:158
+msgid "Creation time"
+msgstr ""
+
+#: .\vjit_network\api\models.py:161
+msgid "Payload"
+msgstr ""
+
+#: .\vjit_network\api\models.py:162
 msgid "Data send with notification"
 msgstr ""
 
-#: .\vjit_network\api\models.py:157
+#: .\vjit_network\api\models.py:168
 msgid "Notification"
+msgstr ""
+
+#: .\vjit_network\api\models.py:169
+msgid "Notifications"
 msgstr ""
 
 #: .\vjit_network\common\mixins.py:22
@@ -121,6 +148,10 @@ msgstr ""
 
 #: .\vjit_network\common\models.py:44
 msgid "Create at"
+msgstr ""
+
+#: .\vjit_network\common\models.py:53
+msgid "Is active"
 msgstr ""
 
 #: .\vjit_network\core\admin.py:49
@@ -207,483 +238,571 @@ msgstr ""
 msgid "Tag name"
 msgstr ""
 
-#: .\vjit_network\core\models.py:71
+#: .\vjit_network\core\models.py:54
+msgid "Tag"
+msgstr ""
+
+#: .\vjit_network\core\models.py:55
+msgid "Tags"
+msgstr ""
+
+#: .\vjit_network\core\models.py:75
 msgid "Create by"
 msgstr ""
 
-#: .\vjit_network\core\models.py:76
+#: .\vjit_network\core\models.py:80
 msgid "Account to upload this file"
 msgstr ""
 
-#: .\vjit_network\core\models.py:79
+#: .\vjit_network\core\models.py:83
 msgid "File name"
 msgstr ""
 
-#: .\vjit_network\core\models.py:82
+#: .\vjit_network\core\models.py:86
 msgid "The name of the file"
 msgstr ""
 
-#: .\vjit_network\core\models.py:85
+#: .\vjit_network\core\models.py:89
 msgid "File size"
 msgstr ""
 
-#: .\vjit_network\core\models.py:86
+#: .\vjit_network\core\models.py:90
 msgid "File size on hard drive"
 msgstr ""
 
-#: .\vjit_network\core\models.py:89
+#: .\vjit_network\core\models.py:93
 msgid "Minetype"
 msgstr ""
 
-#: .\vjit_network\core\models.py:91
+#: .\vjit_network\core\models.py:95
 msgid ""
 "A media type is a standard that indicates the nature and format of a "
 "document, file, or assortment of bytes"
 msgstr ""
 
-#: .\vjit_network\core\models.py:94
+#: .\vjit_network\core\models.py:98
 msgid "File raw"
 msgstr ""
 
-#: .\vjit_network\core\models.py:96
+#: .\vjit_network\core\models.py:100
 msgid "The original file is uploaded from the client"
 msgstr ""
 
-#: .\vjit_network\core\models.py:99
+#: .\vjit_network\core\models.py:103
 msgid "Thumbnails"
 msgstr ""
 
-#: .\vjit_network\core\models.py:105
+#: .\vjit_network\core\models.py:109
 msgid "File"
 msgstr ""
 
-#: .\vjit_network\core\models.py:137
-msgid "Male"
-msgstr ""
-
-#: .\vjit_network\core\models.py:138
-msgid "Female"
-msgstr ""
-
-#: .\vjit_network\core\models.py:139
-msgid "Unknown"
+#: .\vjit_network\core\models.py:110
+msgid "Files"
 msgstr ""
 
 #: .\vjit_network\core\models.py:142
+msgid "Male"
+msgstr ""
+
+#: .\vjit_network\core\models.py:143
+msgid "Female"
+msgstr ""
+
+#: .\vjit_network\core\models.py:144
+msgid "Unknown"
+msgstr ""
+
+#: .\vjit_network\core\models.py:147
 msgid "Avatar"
 msgstr ""
 
-#: .\vjit_network\core\models.py:149 .\vjit_network\core\models.py:567
-#: .\vjit_network\core\models.py:743
+#: .\vjit_network\core\models.py:154 .\vjit_network\core\models.py:585
+#: .\vjit_network\core\models.py:768
 msgid "Slug"
 msgstr ""
 
-#: .\vjit_network\core\models.py:156
+#: .\vjit_network\core\models.py:161
 msgid "Gender"
 msgstr ""
 
-#: .\vjit_network\core\models.py:163
+#: .\vjit_network\core\models.py:168
 msgid "Is online"
 msgstr ""
 
-#: .\vjit_network\core\models.py:167
+#: .\vjit_network\core\models.py:172
 msgid "Is student"
 msgstr ""
 
-#: .\vjit_network\core\models.py:171
+#: .\vjit_network\core\models.py:176
 msgid "Is company"
 msgstr ""
 
-#: .\vjit_network\core\models.py:177 .\vjit_network\core\models.py:228
-#: .\vjit_network\core\models.py:258 .\vjit_network\core\models.py:314
-#: .\vjit_network\core\models.py:520 .\vjit_network\core\models.py:625
-#: .\vjit_network\core\models.py:647 .\vjit_network\core\models.py:840
-#: .\vjit_network\core\models.py:1040
+#: .\vjit_network\core\models.py:182 .\vjit_network\core\models.py:233
+#: .\vjit_network\core\models.py:267 .\vjit_network\core\models.py:327
+#: .\vjit_network\core\models.py:541 .\vjit_network\core\models.py:644
+#: .\vjit_network\core\models.py:667 .\vjit_network\core\models.py:865
+#: .\vjit_network\core\models.py:1062
 msgid "User"
 msgstr ""
 
-#: .\vjit_network\core\models.py:178
+#: .\vjit_network\core\models.py:183
 msgid "Users"
 msgstr ""
 
-#: .\vjit_network\core\models.py:193
+#: .\vjit_network\core\models.py:198
 msgid "Blocker"
 msgstr ""
 
-#: .\vjit_network\core\models.py:199
+#: .\vjit_network\core\models.py:204
 msgid "Blocked user"
 msgstr ""
 
-#: .\vjit_network\core\models.py:205 .\vjit_network\core\models.py:538
-msgid "Is active"
-msgstr ""
-
-#: .\vjit_network\core\models.py:210
+#: .\vjit_network\core\models.py:211
 msgid "Block time"
 msgstr ""
 
-#: .\vjit_network\core\models.py:240
+#: .\vjit_network\core\models.py:227
+msgid "Block user"
+msgstr ""
+
+#: .\vjit_network\core\models.py:228
+msgid "Block users"
+msgstr ""
+
+#: .\vjit_network\core\models.py:245
 msgid "Code OTP"
 msgstr ""
 
-#: .\vjit_network\core\models.py:243
+#: .\vjit_network\core\models.py:248
 msgid "Expired time"
 msgstr ""
 
-#: .\vjit_network\core\models.py:248
+#: .\vjit_network\core\models.py:253
 msgid "Is enable"
 msgstr ""
 
-#: .\vjit_network\core\models.py:264 .\vjit_network\core\models.py:445
-#: .\vjit_network\core\models.py:512 .\vjit_network\core\models.py:574
+#: .\vjit_network\core\models.py:261
+msgid "Verification code"
+msgstr ""
+
+#: .\vjit_network\core\models.py:262
+msgid "Verification codes"
+msgstr ""
+
+#: .\vjit_network\core\models.py:273 .\vjit_network\core\models.py:460
+#: .\vjit_network\core\models.py:529 .\vjit_network\core\models.py:592
 msgid "Description"
 msgstr ""
 
-#: .\vjit_network\core\models.py:269
+#: .\vjit_network\core\models.py:278
 msgid "Link url"
 msgstr ""
 
-#: .\vjit_network\core\models.py:273 .\vjit_network\core\models.py:398
+#: .\vjit_network\core\models.py:282 .\vjit_network\core\models.py:413
 msgid "Title"
 msgstr ""
 
-#: .\vjit_network\core\models.py:279
+#: .\vjit_network\core\models.py:288
 msgid "Link name"
 msgstr ""
 
-#: .\vjit_network\core\models.py:285
+#: .\vjit_network\core\models.py:294
 msgid "Link picture"
 msgstr ""
 
-#: .\vjit_network\core\models.py:303
+#: .\vjit_network\core\models.py:304
+msgid "Link"
+msgstr ""
+
+#: .\vjit_network\core\models.py:305
+msgid "Links"
+msgstr ""
+
+#: .\vjit_network\core\models.py:316
 msgid "User setting"
 msgstr ""
 
-#: .\vjit_network\core\models.py:304
+#: .\vjit_network\core\models.py:317
 msgid "User settings"
 msgstr ""
 
-#: .\vjit_network\core\models.py:322
+#: .\vjit_network\core\models.py:335
 msgid "Skill"
 msgstr ""
 
-#: .\vjit_network\core\models.py:338 .\vjit_network\core\models.py:1028
-msgid "Phone number"
-msgstr ""
-
-#: .\vjit_network\core\models.py:343
-msgid "Birth date"
-msgstr ""
-
-#: .\vjit_network\core\models.py:348 .\vjit_network\core\models.py:791
-msgid "Address"
-msgstr ""
-
-#: .\vjit_network\core\models.py:354
-msgid "Industries"
-msgstr ""
-
-#: .\vjit_network\core\models.py:360
+#: .\vjit_network\core\models.py:336 .\vjit_network\core\models.py:374
 msgid "Skills"
 msgstr ""
 
-#: .\vjit_network\core\models.py:377 .\vjit_network\core\models.py:392
-#: .\vjit_network\core\models.py:461
+#: .\vjit_network\core\models.py:352 .\vjit_network\core\models.py:1046
+msgid "Phone number"
+msgstr ""
+
+#: .\vjit_network\core\models.py:357
+msgid "Birth date"
+msgstr ""
+
+#: .\vjit_network\core\models.py:362 .\vjit_network\core\models.py:816
+msgid "Address"
+msgstr ""
+
+#: .\vjit_network\core\models.py:368 .\vjit_network\core\models.py:730
+msgid "Industries"
+msgstr ""
+
+#: .\vjit_network\core\models.py:391 .\vjit_network\core\models.py:407
+#: .\vjit_network\core\models.py:478
 msgid "Student"
 msgstr ""
 
-#: .\vjit_network\core\models.py:380
+#: .\vjit_network\core\models.py:392
+msgid "Students"
+msgstr ""
+
+#: .\vjit_network\core\models.py:395
 msgid "student - "
 msgstr ""
 
-#: .\vjit_network\core\models.py:403
+#: .\vjit_network\core\models.py:418
 msgid "Employment type"
 msgstr ""
 
-#: .\vjit_network\core\models.py:411 .\vjit_network\core\models.py:810
+#: .\vjit_network\core\models.py:426 .\vjit_network\core\models.py:835
 msgid "Company"
 msgstr ""
 
-#: .\vjit_network\core\models.py:416
+#: .\vjit_network\core\models.py:431
 msgid "Company lookup"
 msgstr ""
 
-#: .\vjit_network\core\models.py:423
+#: .\vjit_network\core\models.py:438
 msgid "Location"
 msgstr ""
 
-#: .\vjit_network\core\models.py:429
+#: .\vjit_network\core\models.py:444
 msgid "I am currently working in this role"
 msgstr ""
 
-#: .\vjit_network\core\models.py:433
+#: .\vjit_network\core\models.py:448
 msgid "Start date"
 msgstr ""
 
-#: .\vjit_network\core\models.py:436
+#: .\vjit_network\core\models.py:451
 msgid "End date"
 msgstr ""
 
-#: .\vjit_network\core\models.py:441
+#: .\vjit_network\core\models.py:456
 msgid "Headline"
 msgstr ""
 
-#: .\vjit_network\core\models.py:467
+#: .\vjit_network\core\models.py:468
+msgid "Experience"
+msgstr ""
+
+#: .\vjit_network\core\models.py:469
+msgid "Experiences"
+msgstr ""
+
+#: .\vjit_network\core\models.py:484
 msgid "School"
 msgstr ""
 
-#: .\vjit_network\core\models.py:471
+#: .\vjit_network\core\models.py:488
 msgid "Degree"
 msgstr ""
 
-#: .\vjit_network\core\models.py:477
+#: .\vjit_network\core\models.py:494
 msgid "Field of study"
 msgstr ""
 
-#: .\vjit_network\core\models.py:483
+#: .\vjit_network\core\models.py:500
 msgid "Start year"
 msgstr ""
 
-#: .\vjit_network\core\models.py:489
+#: .\vjit_network\core\models.py:506
 msgid "End year"
 msgstr ""
 
-#: .\vjit_network\core\models.py:495
+#: .\vjit_network\core\models.py:512
 msgid "Class id"
 msgstr ""
 
-#: .\vjit_network\core\models.py:501
+#: .\vjit_network\core\models.py:518
 msgid "Student code"
 msgstr ""
 
-#: .\vjit_network\core\models.py:507
+#: .\vjit_network\core\models.py:524
 msgid "Activities and societies"
 msgstr ""
 
-#: .\vjit_network\core\models.py:527 .\vjit_network\core\models.py:549
-#: .\vjit_network\core\models.py:596 .\vjit_network\core\models.py:846
+#: .\vjit_network\core\models.py:535
+msgid "Education"
+msgstr ""
+
+#: .\vjit_network\core\models.py:536
+msgid "Educations"
+msgstr ""
+
+#: .\vjit_network\core\models.py:548 .\vjit_network\core\models.py:567
+#: .\vjit_network\core\models.py:614 .\vjit_network\core\models.py:871
 msgid "Group"
 msgstr ""
 
-#: .\vjit_network\core\models.py:534
+#: .\vjit_network\core\models.py:555
 msgid "Timestamp"
 msgstr ""
 
-#: .\vjit_network\core\models.py:543
+#: .\vjit_network\core\models.py:561
 msgid "Join the group"
 msgstr ""
 
-#: .\vjit_network\core\models.py:544
+#: .\vjit_network\core\models.py:562
 msgid "Join the groups"
 msgstr ""
 
-#: .\vjit_network\core\models.py:556 .\vjit_network\core\models.py:732
+#: .\vjit_network\core\models.py:574 .\vjit_network\core\models.py:757
 msgid "Banner"
 msgstr ""
 
-#: .\vjit_network\core\models.py:585
+#: .\vjit_network\core\models.py:603
 msgid "Members count"
 msgstr ""
 
-#: .\vjit_network\core\models.py:589
+#: .\vjit_network\core\models.py:607
 msgid "Posts count"
 msgstr ""
 
-#: .\vjit_network\core\models.py:632 .\vjit_network\core\models.py:895
-#: .\vjit_network\core\models.py:950 .\vjit_network\core\models.py:984
+#: .\vjit_network\core\models.py:615
+msgid "Groups"
+msgstr ""
+
+#: .\vjit_network\core\models.py:651 .\vjit_network\core\models.py:920
+#: .\vjit_network\core\models.py:975 .\vjit_network\core\models.py:1011
 msgid "Post"
 msgstr ""
 
-#: .\vjit_network\core\models.py:640
+#: .\vjit_network\core\models.py:659
 msgid "View"
 msgstr ""
 
-#: .\vjit_network\core\models.py:654 .\vjit_network\core\models.py:991
+#: .\vjit_network\core\models.py:660
+msgid "Views"
+msgstr ""
+
+#: .\vjit_network\core\models.py:674 .\vjit_network\core\models.py:1018
 msgid "Content type"
 msgstr ""
 
-#: .\vjit_network\core\models.py:660 .\vjit_network\core\models.py:998
+#: .\vjit_network\core\models.py:680 .\vjit_network\core\models.py:1025
 msgid "Object id"
 msgstr ""
 
-#: .\vjit_network\core\models.py:667
+#: .\vjit_network\core\models.py:687
 msgid "Parent comment"
 msgstr ""
 
-#: .\vjit_network\core\models.py:672
+#: .\vjit_network\core\models.py:692
 msgid ""
 "If \"parent\" is \"null\" then this is \"parent\" comment.\n"
 "        if \"parent\" is different from \"null\" then this is a \"comment\" "
 "child of \"parent"
 msgstr ""
 
-#: .\vjit_network\core\models.py:676 .\vjit_network\core\models.py:859
-#: .\vjit_network\core\models.py:1034
+#: .\vjit_network\core\models.py:696 .\vjit_network\core\models.py:884
+#: .\vjit_network\core\models.py:1052
 msgid "Content"
 msgstr ""
 
-#: .\vjit_network\core\models.py:677
+#: .\vjit_network\core\models.py:697
 msgid "Content of the comment"
 msgstr ""
 
-#: .\vjit_network\core\models.py:680
+#: .\vjit_network\core\models.py:700
 msgid "Replies count"
 msgstr ""
 
-#: .\vjit_network\core\models.py:685
+#: .\vjit_network\core\models.py:705
 msgid "Comment"
 msgstr ""
 
-#: .\vjit_network\core\models.py:717
-msgid "Public Company"
+#: .\vjit_network\core\models.py:706
+msgid "Comments"
 msgstr ""
 
-#: .\vjit_network\core\models.py:718
-msgid "Selft Employed"
-msgstr ""
-
-#: .\vjit_network\core\models.py:719
-msgid "Goverment Agency"
-msgstr ""
-
-#: .\vjit_network\core\models.py:720
-msgid "NonProfit"
-msgstr ""
-
-#: .\vjit_network\core\models.py:721
-msgid "Privately Held"
-msgstr ""
-
-#: .\vjit_network\core\models.py:722
-msgid "Partnership"
-msgstr ""
-
-#: .\vjit_network\core\models.py:725
-msgid "Logo"
-msgstr ""
-
-#: .\vjit_network\core\models.py:751
+#: .\vjit_network\core\models.py:729 .\vjit_network\core\models.py:776
 msgid "Industry"
 msgstr ""
 
-#: .\vjit_network\core\models.py:757
+#: .\vjit_network\core\models.py:742
+msgid "Public Company"
+msgstr ""
+
+#: .\vjit_network\core\models.py:743
+msgid "Selft Employed"
+msgstr ""
+
+#: .\vjit_network\core\models.py:744
+msgid "Goverment Agency"
+msgstr ""
+
+#: .\vjit_network\core\models.py:745
+msgid "NonProfit"
+msgstr ""
+
+#: .\vjit_network\core\models.py:746
+msgid "Privately Held"
+msgstr ""
+
+#: .\vjit_network\core\models.py:747
+msgid "Partnership"
+msgstr ""
+
+#: .\vjit_network\core\models.py:750
+msgid "Logo"
+msgstr ""
+
+#: .\vjit_network\core\models.py:782
 msgid "Founded"
 msgstr ""
 
-#: .\vjit_network\core\models.py:765
+#: .\vjit_network\core\models.py:790
 msgid "Overview"
 msgstr ""
 
-#: .\vjit_network\core\models.py:770
+#: .\vjit_network\core\models.py:795
 msgid "Company type"
 msgstr ""
 
-#: .\vjit_network\core\models.py:776
+#: .\vjit_network\core\models.py:801
 msgid "Slogan"
 msgstr ""
 
-#: .\vjit_network\core\models.py:783 .\vjit_network\core\models.py:1031
+#: .\vjit_network\core\models.py:808 .\vjit_network\core\models.py:1049
 msgid "Email"
 msgstr ""
 
-#: .\vjit_network\core\models.py:787
+#: .\vjit_network\core\models.py:812
 msgid "Phone"
 msgstr ""
 
-#: .\vjit_network\core\models.py:797
+#: .\vjit_network\core\models.py:822
 msgid "Site url"
 msgstr ""
 
-#: .\vjit_network\core\models.py:811
+#: .\vjit_network\core\models.py:836
 msgid "Companies"
 msgstr ""
 
-#: .\vjit_network\core\models.py:814
+#: .\vjit_network\core\models.py:839
 msgid "company - "
 msgstr ""
 
-#: .\vjit_network\core\models.py:834
+#: .\vjit_network\core\models.py:859
 msgid "Accept"
 msgstr ""
 
-#: .\vjit_network\core\models.py:836
+#: .\vjit_network\core\models.py:861
 msgid "Awaiting approval"
 msgstr ""
 
-#: .\vjit_network\core\models.py:837
+#: .\vjit_network\core\models.py:862
 msgid "Dissent"
 msgstr ""
 
-#: .\vjit_network\core\models.py:853
+#: .\vjit_network\core\models.py:878
 msgid "Public code"
 msgstr ""
 
-#: .\vjit_network\core\models.py:864
+#: .\vjit_network\core\models.py:889
 msgid "Via type"
 msgstr ""
 
-#: .\vjit_network\core\models.py:870
+#: .\vjit_network\core\models.py:895
 msgid "Via id"
 msgstr ""
 
-#: .\vjit_network\core\models.py:877
+#: .\vjit_network\core\models.py:902
 msgid "Extra"
 msgstr ""
 
-#: .\vjit_network\core\models.py:880
+#: .\vjit_network\core\models.py:905
 msgid "Field extension of the model"
 msgstr ""
 
-#: .\vjit_network\core\models.py:883
+#: .\vjit_network\core\models.py:908
 msgid "Views count"
 msgstr ""
 
-#: .\vjit_network\core\models.py:887
+#: .\vjit_network\core\models.py:912
 msgid "Comments count"
 msgstr ""
 
-#: .\vjit_network\core\models.py:896
+#: .\vjit_network\core\models.py:921
 msgid "Posts"
 msgstr ""
 
-#: .\vjit_network\core\models.py:932
+#: .\vjit_network\core\models.py:957
 msgid "User accept"
 msgstr ""
 
-#: .\vjit_network\core\models.py:936
+#: .\vjit_network\core\models.py:961
 msgid "Admin accept"
 msgstr ""
 
-#: .\vjit_network\core\models.py:940
+#: .\vjit_network\core\models.py:965
 msgid "User reason"
 msgstr ""
 
-#: .\vjit_network\core\models.py:945
+#: .\vjit_network\core\models.py:970
 msgid "Admin reason"
 msgstr ""
 
-#: .\vjit_network\core\models.py:971
+#: .\vjit_network\core\models.py:984
+msgid "Approval"
+msgstr ""
+
+#: .\vjit_network\core\models.py:985
+msgid "Approvals"
+msgstr ""
+
+#: .\vjit_network\core\models.py:998
 msgid "Consensus opinion."
 msgstr ""
 
-#: .\vjit_network\core\models.py:973
+#: .\vjit_network\core\models.py:1000
 msgid "Awaiting Approval."
 msgstr ""
 
-#: .\vjit_network\core\models.py:975
+#: .\vjit_network\core\models.py:1002
 msgid "Dissent."
 msgstr ""
 
-#: .\vjit_network\core\models.py:1008
+#: .\vjit_network\core\models.py:1035
 msgid "Attach post"
 msgstr ""
 
-#: .\vjit_network\core\models.py:1009
+#: .\vjit_network\core\models.py:1036
 msgid "Attaches post"
 msgstr ""
 
-#: .\vjit_network\core\models.py:1024
+#: .\vjit_network\core\models.py:1042
 msgid "Full name"
+msgstr ""
+
+#: .\vjit_network\core\models.py:1056
+msgid "Contact"
+msgstr ""
+
+#: .\vjit_network\core\models.py:1057
+msgid "Contacts"
+msgstr ""
+
+#: .\vjit_network\core\models.py:1080
+msgid "Visit logger"
+msgstr ""
+
+#: .\vjit_network\core\models.py:1081
+msgid "Visit loggers"
 msgstr ""
 
 #: .\vjit_network\core\templates\admin\input_filter.html:3

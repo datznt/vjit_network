@@ -11,7 +11,7 @@ mở cmd và cd vào root folder project
 pip install -r 'requirements.txt'
 python manage.py makemigrations
 python manage.py migrate
-python manage.py compilemessages
+python manage.py compilemessages -i env
 python manage.py loaddata fixtures/initial_teachers_app.json
 ```
 **start project:**\
@@ -33,6 +33,6 @@ mở browser nhập **[www.mysite.local:8000](http://www.mysite.local:8000/)** :
  2. sửa lại **msgstr** trong file **[vi/LC_MESSAGES/django.po](locale/vi/LC_MESSAGES/django.po)** cho từng label
  3. biên dịch lại file ngôn ngữ, chạy script:
     ```
-    python manage.py compilemessages
+    python manage.py compilemessages -i env
     ```
  4. restart lại project.

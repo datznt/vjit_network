@@ -1,5 +1,5 @@
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, ContentType, DELETION
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 class LoggingMethodMixin:
     """

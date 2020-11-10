@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.postgres.fields import JSONField
@@ -28,12 +28,18 @@ class Device(UUIDPrimaryModel, PerfectModel):
 
     class Meta:
         unique_together = ('user', 'player_id')
+        verbose_name = _('Devices')
+        verbose_name_plural = _('Devices')
 
 
 class NotificationSetting(UUIDPrimaryModel, PerfectModel):
     device = models.OneToOneField(
         Device, on_delete=models.CASCADE,  default=None)
     turn_off_notification = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('Notification setting')
+        verbose_name_plural = _('Notification settings')
 
 
 class NotificationTemplate(PerfectModel):
@@ -57,6 +63,10 @@ class NotificationTemplate(PerfectModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _('Notification template')
+        verbose_name_plural = _('Notification templates')
+
 
 class NotificationTemplateLocalization(PerfectModel):
     notification_template = models.ForeignKey(
@@ -76,7 +86,8 @@ class NotificationTemplateLocalization(PerfectModel):
 
     class Meta:
         unique_together = ('notification_template', 'language')
-
+        verbose_name = _('Notification template localization')
+        verbose_name_plural = _('Notification template localizations')
 
 class UserNotification(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
@@ -155,3 +166,4 @@ class Notification(UUIDPrimaryModel, PerfectModel):
 
     class Meta:
         verbose_name = _('Notification')
+        verbose_name_plural = _('Notifications')

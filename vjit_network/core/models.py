@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.utils.text import slugify
@@ -49,6 +49,10 @@ class Tag(PerfectModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = _('Tag')
+        verbose_name_plural = _('Tags')
 
 
 class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
@@ -103,6 +107,7 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
 
     class Meta:
         verbose_name = _('File')
+        verbose_name_plural = _('Files')
 
     def has_thumbnail(self):
         return hasattr(self, 'thumbnails') and self.thumbnails is not None and len(self.thumbnails['thumbs']) > 0
@@ -218,6 +223,10 @@ class BlockUser(UUIDPrimaryModel, IsActiveModel, PerfectModel):
         self.is_active = False
         self.save(update_fields=['is_active'])
 
+    class Meta:
+        verbose_name = _('Block user')
+        verbose_name_plural = _('Block users')
+
 
 class O2OUser(models.Model):
     user = models.OneToOneField(
@@ -247,6 +256,10 @@ class VerificationCode(O2OUser, PerfectModel):
 
     def __str__(self):
         return str(self.code)
+
+    class Meta:
+        verbose_name = _('Verification code')
+        verbose_name_plural = _('Verification codes')
 
 
 class Link(BigIntPrimary, CreateAtModel, PerfectModel):
@@ -287,6 +300,10 @@ class Link(BigIntPrimary, CreateAtModel, PerfectModel):
     def __str__(self):
         return self.link
 
+    class Meta:
+        verbose_name = _('Link')
+        verbose_name_plural = _('Links')
+
 
 class UserSetting(O2OUser, PerfectModel):
     language = models.CharField(
@@ -316,6 +333,7 @@ class Skill(BigIntPrimary, CreateAtModel, PerfectModel):
 
     class Meta:
         verbose_name = _('Skill')
+        verbose_name_plural = _('Skills')
 
     def __str__(self):
         return self.name
@@ -371,6 +389,7 @@ class Student(O2OUser, PerfectModel):
 
     class Meta:
         verbose_name = _('Student')
+        verbose_name_plural = _('Students')
 
     def __str__(self):
         return _("student - ") + self.user.username
@@ -446,6 +465,8 @@ class Experience(BigIntPrimary, PerfectModel):
 
     class Meta:
         ordering = ['the_order']
+        verbose_name = _('Experience')
+        verbose_name_plural = _('Experiences')
 
 
 class Education(BigIntPrimary, PerfectModel):
@@ -509,6 +530,10 @@ class Education(BigIntPrimary, PerfectModel):
         null=True,
         blank=True
     )
+
+    class Meta:
+        verbose_name = _('Education')
+        verbose_name_plural = _('Educations')
 
 
 class GroupUser(BigIntPrimary, IsActiveModel, PerfectModel):
@@ -587,6 +612,7 @@ class Group(BigIntPrimary, CreateAtModel, PerfectModel):
 
     class Meta:
         verbose_name = _('Group')
+        verbose_name_plural = _('Groups')
 
     def update_summary(self):
         self.members_count = self.group_members.filter(is_active=True).count()
@@ -631,6 +657,7 @@ class View(BigIntPrimary, CreateAtModel, PerfectModel):
 
     class Meta:
         verbose_name = _('View')
+        verbose_name_plural = _('Views')
         unique_together = ('create_by', 'post')
 
 
@@ -676,6 +703,7 @@ class Comment(BigIntPrimary, CreateAtModel, PerfectModel):
 
     class Meta:
         verbose_name = _('Comment')
+        verbose_name_plural = _('Comments')
 
     @property
     def childrens(self):
@@ -696,6 +724,10 @@ class Industry(PerfectModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = _('Industry')
+        verbose_name_plural = _('Industries')
 
 
 class Company(O2OUser, CreateAtModel, PerfectModel):
@@ -949,6 +981,8 @@ class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = _('Approval')
+        verbose_name_plural = _('Approvals')
 
     def update_public_code(self):
         if self.admin_accept and self.user_accept:
@@ -1018,6 +1052,10 @@ class Contact(BigIntPrimary, CreateAtModel, PerfectModel):
         verbose_name=_('Content'),
     )
 
+    class Meta:
+        verbose_name = _('Contact')
+        verbose_name_plural = _('Contacts')
+
 
 class VisitLogger(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
@@ -1037,6 +1075,10 @@ class VisitLogger(UUIDPrimaryModel, PerfectModel):
         logger, created = user.visit_logger.get_or_create(date=datetime.now())
         logger.visits_count += 1
         logger.save()
+
+    class Meta:
+        verbose_name = _('Visit logger')
+        verbose_name_plural = _('Visit loggers')
 
 
 def get_type(classes):
