@@ -22,7 +22,7 @@ from safedelete.models import SOFT_DELETE
 from ckeditor.fields import RichTextField
 
 from vjit_network.core import manager, customfields, utils
-from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel
+from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel, IsActiveModel
 
 import json
 import uuid
@@ -44,14 +44,14 @@ class EmploymentTypeChoices(models.TextChoices):
     INTERNSHIP = 'internship', _('Internship')
 
 
-class Tag(models.Model):
+class Tag(PerfectModel):
     name = models.CharField(verbose_name=_('Tag name'),  max_length=255)
 
     def __str__(self):
         return self.name
 
 
-class File(UUIDPrimaryModel, CreateAtModel):
+class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
     def directory_path(self):
         """
         0:  user id
@@ -129,7 +129,7 @@ class File(UUIDPrimaryModel, CreateAtModel):
         return self.name
 
 
-class User(BigIntPrimary, AbstractUser):
+class User(BigIntPrimary, AbstractUser, PerfectModel):
     MALE = "male"
     FEMALE = "female"
     UNKNOWN = 'unknown'
@@ -188,7 +188,7 @@ class User(BigIntPrimary, AbstractUser):
         return "user_%s" % self.id
 
 
-class BlockUser(UUIDPrimaryModel):
+class BlockUser(UUIDPrimaryModel, IsActiveModel, PerfectModel):
     create_by = models.ForeignKey(
         verbose_name=_('Blocker'),
         to=User,
@@ -200,10 +200,6 @@ class BlockUser(UUIDPrimaryModel):
         to=User,
         on_delete=models.CASCADE,
         related_name='blocker_list',
-    )
-    is_active = models.BooleanField(
-        verbose_name=_('Is active'),
-        default=True
     )
     block_at = models.DateTimeField(
         auto_now=True,
@@ -235,7 +231,7 @@ class O2OUser(models.Model):
         abstract = True
 
 
-class VerificationCode(O2OUser):
+class VerificationCode(O2OUser, PerfectModel):
     code = models.IntegerField(
         verbose_name=_('Code OTP')
     )
@@ -253,7 +249,7 @@ class VerificationCode(O2OUser):
         return str(self.code)
 
 
-class Link(BigIntPrimary, CreateAtModel):
+class Link(BigIntPrimary, CreateAtModel, PerfectModel):
     create_by = models.ForeignKey(
         verbose_name=_('User'),
         to=User,
@@ -292,7 +288,7 @@ class Link(BigIntPrimary, CreateAtModel):
         return self.link
 
 
-class UserSetting(O2OUser):
+class UserSetting(O2OUser, PerfectModel):
     language = models.CharField(
         verbose_name=_('Language'),
         max_length=2, default='vi',
@@ -304,7 +300,7 @@ class UserSetting(O2OUser):
         verbose_name_plural = _('User settings')
 
 
-class Skill(BigIntPrimary, CreateAtModel):
+class Skill(BigIntPrimary, CreateAtModel, PerfectModel):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
@@ -325,7 +321,7 @@ class Skill(BigIntPrimary, CreateAtModel):
         return self.name
 
 
-class Student(O2OUser):
+class Student(O2OUser, PerfectModel):
     """Profile of account with type are user.
 
     fields:
@@ -387,7 +383,7 @@ class Student(O2OUser):
                 "user__email__icontains",)
 
 
-class Experience(BigIntPrimary):
+class Experience(BigIntPrimary, PerfectModel):
     student = models.ForeignKey(
         verbose_name=_('Student'),
         to=Student,
@@ -452,7 +448,7 @@ class Experience(BigIntPrimary):
         ordering = ['the_order']
 
 
-class Education(BigIntPrimary, models.Model):
+class Education(BigIntPrimary, PerfectModel):
     START_YEAR_CHOICES = list(
         reversed([(r, r) for r in range(1900, datetime.now().year+1)]))
     END_YEAR_CHOICES = list(
@@ -515,7 +511,7 @@ class Education(BigIntPrimary, models.Model):
     )
 
 
-class GroupUser(BigIntPrimary):
+class GroupUser(BigIntPrimary, IsActiveModel, PerfectModel):
     user = models.ForeignKey(
         verbose_name=_('User'),
         to=User,
@@ -534,9 +530,6 @@ class GroupUser(BigIntPrimary):
         verbose_name=_('Timestamp'),
         auto_now_add=True,
     )
-    is_active = models.BooleanField(
-        verbose_name=_('Is active'), default=True
-    )
 
     class Meta:
         unique_together = ['user', 'group']
@@ -544,7 +537,7 @@ class GroupUser(BigIntPrimary):
         verbose_name_plural = _('Join the groups')
 
 
-class Group(BigIntPrimary, CreateAtModel):
+class Group(BigIntPrimary, CreateAtModel, PerfectModel):
     create_by = models.ForeignKey(
         verbose_name=_('Group'),
         to=User,
@@ -620,7 +613,7 @@ class Group(BigIntPrimary, CreateAtModel):
         return self.name
 
 
-class View(BigIntPrimary, CreateAtModel):
+class View(BigIntPrimary, CreateAtModel, PerfectModel):
     create_by = models.ForeignKey(
         verbose_name=_('User'),
         to=User,
@@ -641,7 +634,7 @@ class View(BigIntPrimary, CreateAtModel):
         unique_together = ('create_by', 'post')
 
 
-class Comment(BigIntPrimary, CreateAtModel):
+class Comment(BigIntPrimary, CreateAtModel, PerfectModel):
     limit = models.Q(app_label='core', model='post')
     create_by = models.ForeignKey(
         verbose_name=_('User'),
@@ -695,7 +688,7 @@ class Comment(BigIntPrimary, CreateAtModel):
         self.replies_count = replies_count
 
 
-class Industry(models.Model):
+class Industry(PerfectModel):
     name = models.CharField(
         verbose_name=_('Name'), max_length=255, default=None,
         help_text=('The name of the industry')
@@ -705,7 +698,7 @@ class Industry(models.Model):
         return self.name
 
 
-class Company(O2OUser, CreateAtModel):
+class Company(O2OUser, CreateAtModel, PerfectModel):
     PUBLIC_COMPANY = 'PC'
     SELFT_EMPLOYED = 'SE'
     GOVERMENT_AGENCY = 'GA'
@@ -822,7 +815,7 @@ class Company(O2OUser, CreateAtModel):
         )
 
 
-class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel):
+class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
 
     _safedelete_policy = SOFT_DELETE
 
@@ -926,7 +919,7 @@ class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel):
             return self.group.name
 
 
-class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel):
+class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
     _safedelete_policy = SOFT_DELETE
     user_accept = models.BooleanField(
         verbose_name=_('User accept'),
@@ -975,7 +968,7 @@ class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel):
             return _('Dissent.')
 
 
-class AttachPost(BigIntPrimary, SafeDeleteModel):
+class AttachPost(BigIntPrimary, SafeDeleteModel, PerfectModel):
     _safedelete_policy = SOFT_DELETE
     limit = models.Q(
         app_label='core', model='file') | models.Q(
@@ -1010,16 +1003,7 @@ class AttachPost(BigIntPrimary, SafeDeleteModel):
         # unique_together = ('post', 'content_type', 'object_id')
 
 
-def get_type(classes):
-    try:
-        if isinstance(classes, int):
-            return ContentType.objects.get(pk=classes)
-        return ContentType.objects.get_for_model(classes)
-    except:
-        return None
-
-
-class Contact(BigIntPrimary, CreateAtModel):
+class Contact(BigIntPrimary, CreateAtModel, PerfectModel):
     name = models.CharField(
         verbose_name=_('Full name'),
         max_length=255
@@ -1035,7 +1019,7 @@ class Contact(BigIntPrimary, CreateAtModel):
     )
 
 
-class VisitLogger(UUIDPrimaryModel,):
+class VisitLogger(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
         verbose_name=_('User'),
         to=User,
@@ -1053,3 +1037,12 @@ class VisitLogger(UUIDPrimaryModel,):
         logger, created = user.visit_logger.get_or_create(date=datetime.now())
         logger.visits_count += 1
         logger.save()
+
+
+def get_type(classes):
+    try:
+        if isinstance(classes, int):
+            return ContentType.objects.get_for_id(classes)
+        return ContentType.objects.get_for_model(classes)
+    except:
+        return None

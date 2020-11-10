@@ -3,6 +3,7 @@ from django.conf import settings
 from django.views import View
 from django.db.models import Sum, Count
 from django.utils.timezone import datetime
+from django.core.cache import cache
 from vjit_network.core import models
 import os
 
@@ -23,13 +24,17 @@ def read_file(request):
 
 class AdminDashboardView(View):
     def get(self, request, *args, **kwargs):
-        traffic_statistics = self._chart_traffic_statistics()
-        user_type_statistics = self._chart_user_type_statistics()
-        return JsonResponse({
-            'charts': {
+        dashboard_statistics = cache.get('dashboard_statistics', None)
+        if not dashboard_statistics:
+            traffic_statistics = self._chart_traffic_statistics()
+            user_type_statistics = self._chart_user_type_statistics()
+            dashboard_statistics = {
                 'traffic_statistics': traffic_statistics,
                 'user_type_statistics': user_type_statistics
             }
+            cache.set('dashboard_statistics', dashboard_statistics, 60 * 60 * 24)
+        return JsonResponse({
+            'charts': dashboard_statistics
         })
 
     def _chart_traffic_statistics(self):

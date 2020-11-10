@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import JSONField
 from django.template import Template, Context
 from django.contrib.sites.models import Site
 from vjit_network.core.models import UserSetting
-from vjit_network.common.models import UUIDPrimaryModel
+from vjit_network.common.models import UUIDPrimaryModel, PerfectModel
 from ckeditor.fields import RichTextField
 
 import uuid
@@ -17,7 +17,7 @@ import json
 User = get_user_model()
 
 
-class Device(UUIDPrimaryModel):
+class Device(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, default=None, related_name='devices')
     device = models.CharField(max_length=100, null=True, blank=False)
@@ -30,13 +30,13 @@ class Device(UUIDPrimaryModel):
         unique_together = ('user', 'player_id')
 
 
-class NotificationSetting(UUIDPrimaryModel):
+class NotificationSetting(UUIDPrimaryModel, PerfectModel):
     device = models.OneToOneField(
         Device, on_delete=models.CASCADE,  default=None)
     turn_off_notification = models.BooleanField(default=False)
 
 
-class NotificationTemplate(models.Model):
+class NotificationTemplate(PerfectModel):
     name = models.CharField(
         max_length=100, verbose_name=_('Name'), default=None)
     image_field_name = models.TextField(
@@ -58,12 +58,12 @@ class NotificationTemplate(models.Model):
         return self.name
 
 
-class NotificationTemplateLocalization(models.Model):
+class NotificationTemplateLocalization(PerfectModel):
     notification_template = models.ForeignKey(
         NotificationTemplate, on_delete=models.CASCADE, related_name='localizations')
     language = models.CharField(
         verbose_name=_('Language'), max_length=2, default='vi', choices=settings.LANGUAGES,
-        
+
     )
     title_html = RichTextField(verbose_name=_(
         'Title format html'), default=None)
@@ -78,7 +78,7 @@ class NotificationTemplateLocalization(models.Model):
         unique_together = ('notification_template', 'language')
 
 
-class UserNotification(UUIDPrimaryModel):
+class UserNotification(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="notifications_user")
     notification = models.ForeignKey(
@@ -135,10 +135,10 @@ class UserNotification(UUIDPrimaryModel):
         return data
 
 
-class Notification(UUIDPrimaryModel):
+class Notification(UUIDPrimaryModel, PerfectModel):
     actor = models.ForeignKey(
         verbose_name=_('Actor'), to=User, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_actor',
-        
+
     )
     template = models.ForeignKey(
         verbose_name=_('Notification template'), to=NotificationTemplate, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_created',

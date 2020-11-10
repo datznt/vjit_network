@@ -47,3 +47,12 @@ class CreateAtModel(models.Model):
 
     class Meta:
         abstract = True
+
+class IsActiveModel(models.Model):
+    is_active = models.BooleanField(
+        verbose_name=_('Is active'),
+        default=True
+    )
+
+    class Meta:
+        abstract = True

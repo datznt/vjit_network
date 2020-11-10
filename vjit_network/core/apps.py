@@ -7,5 +7,4 @@ class CoreConfig(AppConfig):
     verbose_name = _('System content')
 
     def ready(self):
-        import vjit_network.core.signals
-        import vjit_network.core.utils
+        from vjit_network.core import signals, utils
