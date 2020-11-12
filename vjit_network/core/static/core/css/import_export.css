@@ -9,3 +9,25 @@
     background-color: #f1f5f7;
     border-color: #dee2e6;
 }
+.import-form{
+    margin-bottom: 2rem;
+}
+.display-none{
+    display: none;
+}
+.responsive-table{
+    max-width: 100%;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+.grp-button.confirm{
+    width: auto;
+}
+.field-invalid{
+    background-color: rgba(220, 20, 20, 0.384);
+}
+.field-valid{
+    background-color: rgba(127, 255, 165, 0.164);
+}

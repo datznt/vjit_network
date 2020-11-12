@@ -7,22 +7,64 @@
 
 {% block extrastyle %}
 {{ block.super }}
-
+<link rel="stylesheet" type="text/css" href="{% static "core/css/import_export.css" %}" />
 <!-- vuejs -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+<script>
+  window.$DATA = JSON.parse('{% autoescape off %}{{validated_data}}{% endautoescape %}');
+</script>
+<script src="https://unpkg.com/vue"></script>
 {% endblock %}
 
 {% block content %}
-<form action="." method="POST" enctype="multipart/form-data">
+<div class="import-form">
+  <form action="." method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <p>
-        This importer will import the following fields: id, create_at, name, slug, description, create_by
+      This importer will import the following fields: id, create_at, name, slug, description, create_by
     </p>
     <br>
     {{ form.as_p }}
     <br>
     <div class="submit-row">
-      <input type="submit" class="default" name="confirm" value="{% trans 'Confirm import' %}">
+      <input type="submit" class="default" name="confirm" value="{% trans 'Submit' %}">
     </div>
-</form>
+  </form>
+</div>
+<div class="import-content" id="app">
+  <div class="content-wrapper" v-if="rows.length">
+    <h4>Preview</h4>
+    <div class="responsive-table">
+      <table class="import-preview">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th v-for="(col,index) in columns" :key="index">[[ col ]]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(r,index) in rows" :key="index">
+            <td>[[index + 1]]</td>
+            <td :class="getCellClass(r, 'username' )"> [[getValueOrError(r,'username')]]</td>
+            <td :class="getCellClass(r, 'password' )"> [[getValueOrError(r,'password')]]</td>
+            <td :class="getCellClass(r, 'first_name' )">[[getValueOrError(r,'first_name')]]</td>
+            <td :class="getCellClass(r, 'last_name' )">[[getValueOrError(r,'last_name')]]</td>
+            <td :class="getCellClass(r, 'email' )">[[getValueOrError(r,'email')]]</td>
+            <td :class="getCellClass(r, 'gender' )">[[getValueOrError(r,'gender')]]</td>
+            <td :class="getCellClass(r, 'phone' )">[[getValueOrError(r,'phone')]]</td>
+            <td :class="getCellClass(r, 'birth_date' )">[[getValueOrError(r,'birth_date')]]</td>
+            <td :class="getCellClass(r, 'address' )">[[getValueOrError(r,'address')]]</td>
+            <td :class="getCellClass(r, 'school_name' )">[[getValueOrError(r,'school_name')]]</td>
+            <td :class="getCellClass(r, 'class_id' )">[[getValueOrError(r,'class_id')]]</td>
+            <td :class="getCellClass(r, 'student_code' )">[[getValueOrError(r,'student_code')]]</td>
+            <td :class="getCellClass(r, 'field_of_study' )">[[getValueOrError(r,'field_of_study')]]</td>
+            <td :class="getCellClass(r, 'start_year' )">[[getValueOrError(r,'start_year')]]</td>
+            <td :class="getCellClass(r, 'end_year' )">[[getValueOrError(r,'end_year')]]</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="grp-button confirm" @click="submitData">{% trans 'Confirm import' %}</button>
+  </div>
+</div>
+<script src="{% static "core/js/student_import.js" %}"></script>
 {% endblock %}

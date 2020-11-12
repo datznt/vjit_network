@@ -13,6 +13,7 @@ from django import forms
 from django.utils.timezone import datetime
 from django.urls import path
 from django.shortcuts import render
+from django.core.serializers.json import DjangoJSONEncoder
 from grappelli.dashboard import modules, Dashboard
 from import_export.admin import ImportMixin, ImportExportActionModelAdmin
 from rest_framework.authtoken.models import Token
@@ -22,6 +23,7 @@ from vjit_network.core.models import Post, File, Company, Comment, View, Industr
 
 from io import BytesIO
 import pandas as pd
+import json
 
 # Register your models here
 EXCEL_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -380,7 +382,7 @@ class GroupUserAdmin(ModelAdmin):
         def queryset(self, request, queryset):
             value = self.value()
             if value is not None:
-                return queryset.filter( group__id=value )
+                return queryset.filter(group__id=value)
 
     list_filter = ('is_active', group_name_filter, group_id_filter,)
 
@@ -453,30 +455,23 @@ class StudentAdmin(ModelAdmin):
         return my_urls + urls
 
     def import_student(self, request):
-        # ...
+        validated_data = []
         if request.method == 'POST':
             form = forms.StudentUploadForm(
                 data=request.POST, files=request.FILES)
             if form.is_valid():
-                form.save()
-            else:
-                print(form.errors)
-        form = forms.StudentUploadForm()
+                validated_data = form.get_validated()
+        else:
+            form = forms.StudentUploadForm()
         context = dict(
             # Include common variables for rendering the admin template.
             self.admin_site.each_context(request),
             # Anything else you want in the context...
             opts=self.model._meta,
             app_label=self.model._meta.app_label,
-            change=True,
-            add=False,
-            is_popup=False,
-            save_as=False,
-            has_delete_permission=False,
-            has_add_permission=False,
-            has_change_permission=True,
             title='Import Students',
-            form=form
+            form=form,
+            validated_data=json.dumps(validated_data, cls=DjangoJSONEncoder)
         )
         return render(request, self.student_import_template, context)
 
