@@ -400,7 +400,7 @@ class StudentAdmin(ModelAdmin):
             form = forms.StudentUploadForm(
                 data=request.POST, files=request.FILES)
             if form.is_valid():
-                print('pke')
+                form.save()
             else:
                 print(form.errors)
         form = forms.StudentUploadForm()
