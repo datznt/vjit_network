@@ -47,6 +47,8 @@ class StudentUploadForm(forms.Form):
 
     def save(self):
         excel: pd.DataFrame = self._excel
+
+        error_list, success_list = [], []
         for index, row in excel.iterrows():
 
             user_form = UserBaseForm({

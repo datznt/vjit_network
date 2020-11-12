@@ -44,28 +44,90 @@ class MyDashboard(Dashboard):
     def __init__(self, **kwargs):
         Dashboard.__init__(self, **kwargs)
 
-        # append an app list module for "Applications"
-        self.children.append(modules.AppList(
-            title=_('Applications'),
+        self.children.append(modules.Group(
+            title=_("System maintenance"),
             column=1,
             collapsible=True,
-            exclude=('django.contrib.*',),
+            children=[
+                modules.ModelList(
+                    title=_('User types'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.core.models.User',
+                        'vjit_network.core.models.Student',
+                        'vjit_network.core.models.Company',
+                    ],
+                ),
+                modules.ModelList(
+                    title=_('Social'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.core.models.Post',
+                        'vjit_network.core.models.View',
+                        'vjit_network.core.models.Comment',
+                        'vjit_network.core.models.Link',
+                    ],
+                ),
+                modules.ModelList(
+                    title=_('Media'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.core.models.File',
+                    ],
+                ),
+                modules.ModelList(
+                    title=_('Group'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.core.models.Group',
+                        'vjit_network.core.models.GroupUser',
+                    ],
+                )
+            ]
         ))
 
-        # append an app list module for "Administration"
+        self.children.append(modules.Group(
+            title=_("System API"),
+            column=1,
+            collapsible=True,
+            children=[
+                modules.ModelList(
+                    title=_('User devices'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.api.models.Device',
+                    ],
+                ),
+                modules.ModelList(
+                    title=_('Notification'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.api.models.NotificationTemplate',
+                        'vjit_network.api.models.Notification',
+                    ],
+                ),
+            ]
+        ))
+
+        # append a recent actions module
         self.children.append(modules.AppList(
             title=_('Administration'),
-            column=1,
+            column=2,
             collapsible=True,
             models=('django.contrib.*',),
         ))
 
-        # append a recent actions module
         self.children.append(modules.RecentActions(
             title=_('Recent actions'),
             column=2,
             collapsible=True,
-            limit=19,
+            limit=10,
         ))
 
     class Media:
@@ -309,9 +371,7 @@ class GroupUserAdmin(ModelAdmin):
         def queryset(self, request, queryset):
             value = self.value()
             if value is not None:
-                return queryset.filter(
-                    group__name=value
-                )
+                return queryset.filter(group__name=value)
 
     class group_id_filter(customfields.InputFilter):
         title = _('group id')
@@ -320,9 +380,7 @@ class GroupUserAdmin(ModelAdmin):
         def queryset(self, request, queryset):
             value = self.value()
             if value is not None:
-                return queryset.filter(
-                    group__id=value
-                )
+                return queryset.filter( group__id=value )
 
     list_filter = ('is_active', group_name_filter, group_id_filter,)
 
@@ -439,7 +497,6 @@ admin.site.register(View, ViewAdmin)
 admin.site.register(Industry)
 admin.site.register(Tag)
 admin.site.register(Skill)
-# admin.site.register(ContentType, ContentTypeAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Student, StudentAdmin)

@@ -3,4 +3,6 @@
 {% load admin_urls %}
 {% load import_export_tags %}
 {% load static %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "core/css/import_export.css" %}" />{% endblock %}
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "core/css/import_export.css" %}" />
+{% endblock %}

@@ -4,6 +4,14 @@
 {% load admin_urls %}
 {% load static %}
 
+
+{% block extrastyle %}
+{{ block.super }}
+
+<!-- vuejs -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+{% endblock %}
+
 {% block content %}
 <form action="." method="POST" enctype="multipart/form-data">
     {% csrf_token %}

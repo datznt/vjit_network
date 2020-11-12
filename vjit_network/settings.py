@@ -50,9 +50,9 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'import_export',
 
-    'vjit_network.core.apps.CoreConfig',
-    'vjit_network.api.apps.ApiConfig',
-    'vjit_network.common.apps.CommonConfig',
+    'vjit_network.common',
+    'vjit_network.core',
+    'vjit_network.api',
 ]
 
 MIDDLEWARE = [
