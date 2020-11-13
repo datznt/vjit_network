@@ -4,7 +4,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.exceptions import ValidationError
 
-from vjit_network.core.utils import reverse
 from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode
 from vjit_network.api.models import NotificationTemplate, NotificationTemplateLocalization, Notification, UserNotification, Device
 from vjit_network.common.validators import MaxValueValidator, MinValueValidator, OtpValidator
@@ -13,7 +12,6 @@ from vjit_network.api.bussines import otp_is_expired
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse as base_reverse
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 

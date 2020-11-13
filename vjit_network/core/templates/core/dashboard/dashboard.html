@@ -1,7 +1,7 @@
 {% load i18n grp_dashboard_tags %}
 
 {{ dashboard.media }}
-
+<script>window.$DASHBOARD_URL = '{% url "core:admin_dashboard" %}'</script>
 <div class="g-d-c">
     <div class="g-d-12 g-d-f">
         <div class="grp-module actions grp-dashboard-module grp-collapse grp-open">

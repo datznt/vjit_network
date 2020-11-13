@@ -33,7 +33,7 @@
 
     function fetchAPI(success, error) {
         $.ajax({
-            url: '/dashboard-data'
+            url: window.$DASHBOARD_URL
         }).done(function (data) {
             renderCharts(data);
         })

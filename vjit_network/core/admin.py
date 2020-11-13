@@ -20,6 +20,7 @@ from rest_framework.authtoken.models import Token
 
 from vjit_network.core import utils, customfields, resources, business, forms
 from vjit_network.core.models import Post, File, Company, Comment, View, Industry, Tag, Skill, Link, User, Student, Group, GroupUser, Contact, get_type, UserSetting, AttachPost, Approval, Experience, Education
+from vjit_network.common.utils import truncate_string, reverse
 
 from io import BytesIO
 import pandas as pd
@@ -211,7 +212,7 @@ class GroupAdmin(CustomImportExportActionModelAdmin, ModelAdmin):
 
     def view_all_member(self, instance):
         ct = get_type(GroupUser)
-        link = utils.reverse('admin:{0}_{1}_{2}'.format(ct.app_label, ct.model, 'changelist'), query_kwargs={
+        link = reverse('admin:{0}_{1}_{2}'.format(ct.app_label, ct.model, 'changelist'), query_kwargs={
             'group__id': instance.id
         })
         # print(link)
@@ -331,7 +332,7 @@ class CommentAdmin(ModelAdmin):
     inlines = [reply_inline]
 
     def short_content(self, obj):
-        return utils.truncate_string(obj.content)
+        return truncate_string(obj.content)
 
     def save_model(self, request, obj, form, change):
         obj.create_by = request.user

@@ -1,15 +1,12 @@
-import mimetypes as mt
+from django.conf import settings
+from django.contrib.sites.models import Site
+
 from PIL import Image
 from PIL.ExifTags import TAGS
 from cv2 import cv2
-import os
-from django.utils.http import urlencode
-from django.conf import settings
-from django.urls import reverse as base_reverse
-from django.contrib.sites.models import Site
-from django.template.defaultfilters import truncatechars
-
 from urllib.parse import urljoin
+import mimetypes as mt
+import os
 
 def create_thumbnail(source, storage, dimensions) -> (bool, Image):
     _result, _thumbnails, file_type = False, None, None
@@ -83,10 +80,6 @@ def save_thumbnails(thumbnails, file_modal, file_type):
         'thumbs' : [] 
     }
     for thumbnail in thumbnails:
-        # split_res = file_modal.name.split('.')
-        # file_extention = split_res[-1]
-        # if file_type == "video":
-        #     file_extention = 'png'
         file_extention = 'png'
         file_name = str(thumbnail.size[0])+'x'+str(thumbnail.size[1])+'.' + file_extention
         path_thumbnail = os.path.join(thumbnails_folder['path'],file_name)
@@ -94,19 +87,6 @@ def save_thumbnails(thumbnails, file_modal, file_type):
         if save_ok:
             thumbnails_folder['thumbs'].append(file_name)
     return thumbnails_folder
-
-def reverse(view, urlconf=None, args=None, kwargs=None, current_app=None, query_kwargs=None):
-    '''Custom reverse to handle query strings.
-    Usage:
-        reverse('app.views.my_view', kwargs={'pk': 123}, query_kwargs={'search', 'Bob'})
-    '''
-    base_url = base_reverse(view, urlconf=urlconf, args=args,
-                            kwargs=kwargs, current_app=current_app)
-    # default_site_settings = Site.objects.get_current()
-    # base_url = default_site_settings.domain + base_url
-    if query_kwargs:
-        return '{}?{}'.format(base_url, urlencode(query_kwargs))
-    return base_url
 
 def get_absolute_media_path(media_path, domain):
     assert media_path and domain, "To convert media to url you need media_path"
@@ -118,8 +98,3 @@ def get_absolute_media_path(media_path, domain):
         raise "The file does not exist"
 
     return urljoin(domain,settings.MEDIA_URL,media_path)
-
-def truncate_string(string):
-    if not string:
-        return None
-    return truncatechars(string,100)

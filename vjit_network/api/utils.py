@@ -1,11 +1,11 @@
-from urllib.parse import urlparse
-from vjit_network.core.models import File
 from django.contrib.auth import authenticate
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.urls import reverse as base_reverse
 from django.contrib.sites.models import Site
 from django.utils.http import urlencode
+from rest_framework import serializers
+from vjit_network.core.models import File
+from urllib.parse import urlparse
+from typing import List
 import extraction
 import requests
 import random
@@ -27,18 +27,6 @@ def create_user_account(username, email, password, first_name="",
     return user
 
 
-def reverse(view, urlconf=None, args=None, kwargs=None, current_app=None, query_kwargs=None):
-    '''Custom reverse to handle query strings.
-    Usage:
-        reverse('app.views.my_view', kwargs={'pk': 123}, query_kwargs={'search', 'Bob'})
-    '''
-    base_url = base_reverse(view, urlconf=urlconf, args=args,
-                            kwargs=kwargs, current_app=current_app)
-    if query_kwargs:
-        return '{}?{}'.format(base_url, urlencode(query_kwargs))
-    return base_url
-
-
 def extraction_link(url):
     html = requests.get(url).text
     parsed_uri = urlparse(url)
@@ -52,3 +40,36 @@ def extraction_link(url):
 
 def random_range(from_num : int, to_num : int):
     return random.randint(from_num, to_num)
+
+class NotificationBuilder:
+    notification = None
+
+    def __init__(self, title, content, title_html, content_html, recipients: List[User]):
+        self.title = title
+        self.content = content
+        self.title_html = title_html
+        self.content_html = content_html
+        self.recipients = recipients
+
+    @classmethod
+    def push(cls, title, content, title_html=None, content_html=None, recipients=[]):
+        instance = cls(
+            title=title,
+            content=content,
+            title_html=title_html or title,
+            content_html=content_html or content,
+            recipients=recipients
+        )
+        instance.notification = instance._push_notification()
+
+    def _push_notification(self):
+        from vjit_network.api.models import Notification
+        notification = Notification.objects.create(
+            title_plantext=self.title,
+            content_plantext=self.content,
+            title_html=self.title_html,
+            content_html=self.content_html
+        )
+        notification.recipients.set(self.recipients)
+        notification.update_fields(is_publish=True)
+        return notification

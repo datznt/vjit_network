@@ -32,7 +32,6 @@ from vjit_network.common.mixins import LoggingViewSetMixin
 from vjit_network.api import serializers, permissions, utils, filtersets
 
 from wsgiref.util import FileWrapper
-# from django.urls import reverse
 import re
 # Create your views here.
 
