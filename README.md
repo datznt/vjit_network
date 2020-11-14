@@ -11,8 +11,10 @@ mở cmd và cd vào root folder project
 pip install -r 'requirements.txt'
 python manage.py makemigrations
 python manage.py migrate
+python manage.py createcachetable
 python manage.py compilemessages -i env
-python manage.py loaddata fixtures/initial_teachers_app.json
+python manage.py loaddata fixtures/sites.json
+python manage.py loaddata fixtures/notification.json
 ```
 **start project:**\
 ```

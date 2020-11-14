@@ -1,0 +1,1 @@
+[{"model": "sites.site", "pk": 1, "fields": {"domain": "https://vjit.cf/", "name": "api"}}, {"model": "sites.site", "pk": 2, "fields": {"domain": "https://vjit.surge.sh", "name": "web"}}, {"model": "sites.site", "pk": 3, "fields": {"domain": "alumi://vjit.cf", "name": "app"}}]
