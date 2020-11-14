@@ -1011,6 +1011,7 @@ class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
             return _('Awaiting Approval.')
         elif (not self.admin_accept and not self.user_accept) or (self.admin_accept and not self.user_accept):
             return _('Dissent.')
+        return _('Awaiting Approval.')
 
 
 class AttachPost(BigIntPrimary, SafeDeleteModel, PerfectModel):
@@ -1047,6 +1048,8 @@ class AttachPost(BigIntPrimary, SafeDeleteModel, PerfectModel):
         verbose_name_plural = _('Attaches post')
         # unique_together = ('post', 'content_type', 'object_id')
 
+    def __str__(self):
+        return str(self.pk)
 
 class Contact(BigIntPrimary, CreateAtModel, PerfectModel):
     name = models.CharField(

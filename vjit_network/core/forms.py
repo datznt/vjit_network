@@ -12,6 +12,7 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
 class UserCreationForm(forms.ModelForm):
     class Meta:
         model = User
@@ -20,6 +21,12 @@ class UserCreationForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=125, required=True)
 
+    def save(self, commit=False):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
 class StudentCreationForm(forms.ModelForm):
     class Meta:
