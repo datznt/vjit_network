@@ -24,7 +24,7 @@ USER_TYPES_CHOICES = ['is_staff', 'is_student', 'is_company']
 
 def read_file(request):
     f = open(os.path.join(settings.BASE_DIR, '.well-known',
-                          'pki-validation', 'A1F0193986BD8F1AD1188A7DBED26B72.txt'), 'r')
+                          'pki-validation', 'A0A183D1A0C45A0E1E7DCB87545B2C2E.txt'), 'r')
     file_content = f.read()
     f.close()
     return HttpResponse(file_content, content_type="text/plain")
