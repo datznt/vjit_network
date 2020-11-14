@@ -203,7 +203,7 @@ class UserSettingViewSet(
 
 
 class GroupViewSet(
-        MethodSerializerView,
+        MethodSerializerView, mixins.RetrieveModelMixin,
         mixins.ListModelMixin, mixins.UpdateModelMixin,
         mixins.CreateModelMixin, mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
@@ -255,10 +255,10 @@ class GroupViewSet(
         serializer.save(create_by=self.request.user)
 
 
-class GroupUserViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class GroupUserViewSet(mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin, mixins.UpdateModelMixin,
+                       mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -273,10 +273,10 @@ class GroupUserViewSet(
     queryset = GroupUser.objects.all()
 
 
-class FileViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class FileViewSet(mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin, mixins.UpdateModelMixin,
+                  mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                  viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -299,10 +299,10 @@ class FileViewSet(
         return qs.filter(create_by=self.request.user)
 
 
-class PostViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        LoggingViewSetMixin, viewsets.GenericViewSet):
+class PostViewSet(mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin, mixins.UpdateModelMixin,
+                  mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                  LoggingViewSetMixin, viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -317,10 +317,10 @@ class PostViewSet(
     search_fields = ('content', 'create_by__username', 'create_by__full_name',)
 
 
-class ViewViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class ViewViewSet(mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin, mixins.UpdateModelMixin,
+                  mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                  viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -337,14 +337,15 @@ class ViewViewSet(
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(
+            self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
 
-class CommentViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class CommentViewSet(mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin, mixins.UpdateModelMixin,
+                     mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                     viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -366,7 +367,8 @@ class CommentViewSet(
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(
+            self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
 
@@ -381,9 +383,9 @@ class StudentViewSet(
     serializer_class = serializers.StudentSerializer
 
 
-class CompanyViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, viewsets.GenericViewSet):
+class CompanyViewSet(mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin, mixins.UpdateModelMixin,
+                     mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -421,10 +423,10 @@ class TagViewSet(
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class SkillViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class SkillViewSet(mixins.RetrieveModelMixin,
+                   mixins.ListModelMixin, mixins.UpdateModelMixin,
+                   mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -437,10 +439,10 @@ class SkillViewSet(
     search_fields = ('name', 'id',)
 
 
-class IndustryViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class IndustryViewSet(mixins.RetrieveModelMixin,
+                      mixins.ListModelMixin, mixins.UpdateModelMixin,
+                      mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -450,10 +452,10 @@ class IndustryViewSet(
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class UserNotificationViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class UserNotificationViewSet(mixins.RetrieveModelMixin,
+                              mixins.ListModelMixin, mixins.UpdateModelMixin,
+                              mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                              viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -473,10 +475,10 @@ class UserNotificationViewSet(
         return qs.filter(user=self.request.user)
 
 
-class UserDeviceViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class UserDeviceViewSet(mixins.RetrieveModelMixin,
+                        mixins.ListModelMixin, mixins.UpdateModelMixin,
+                        mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -496,9 +498,9 @@ class UserDeviceViewSet(
         return qs.filter(user=self.request.user)
 
 
-class LinkViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, viewsets.GenericViewSet):
+class LinkViewSet(mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin, mixins.UpdateModelMixin,
+                  mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -514,18 +516,18 @@ class LinkViewSet(
         serializer.save(create_by=self.request.user)
 
 
-class ContactViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, viewsets.GenericViewSet):
+class ContactViewSet(mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin, mixins.UpdateModelMixin,
+                     mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.ContactSerializer
     permission_classes = (AllowAny,)
     queryset = Contact.objects.all()
 
 
-class BlockUserViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin,
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+class BlockUserViewSet(mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin, mixins.UpdateModelMixin,
+                       mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
