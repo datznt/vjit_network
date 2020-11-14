@@ -31,6 +31,8 @@ EXCEL_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.s
 
 
 class ModelAdmin(admin.ModelAdmin):
+    list_per_page = 10
+
     class Media:
         css = {
             "all": ("core/css/grappelli.css",)
@@ -88,6 +90,14 @@ class MyDashboard(Dashboard):
                     models=[
                         'vjit_network.core.models.Group',
                         'vjit_network.core.models.GroupUser',
+                    ],
+                ),
+                modules.ModelList(
+                    title=_('Contact'),
+                    column=1,
+                    collapsible=True,
+                    models=[
+                        'vjit_network.core.models.Contact',
                     ],
                 )
             ]
@@ -168,11 +178,12 @@ class UserAdmin(DjangoUserAdmin):
             'fields': ('username', 'password1', 'password2'),
         }),
     )
-    list_display = ('username', 'email', 'fullname',
+    list_display = ('username', 'email', 'full_name',
                     'is_staff', 'is_student', 'is_company',)
     list_filter = ('is_company', 'is_student', 'is_staff',
                    'is_superuser', 'is_active')
     list_per_page = 10
+    date_hierarchy = 'date_joined'
 
     class user_setting_inline(admin.StackedInline):
         model = UserSetting
@@ -185,11 +196,6 @@ class UserAdmin(DjangoUserAdmin):
         autocomplete_fields = ('group',)
 
     inlines = [group_user_inline, user_setting_inline]
-
-    def fullname(self, instance):
-        return instance.full_name
-
-    fullname.admin_order_field = 'fullname'
 
 
 class GroupAdmin(CustomImportExportActionModelAdmin, ModelAdmin):
@@ -361,7 +367,7 @@ class ViewAdmin(ModelAdmin):
 
 
 class GroupUserAdmin(ModelAdmin):
-    search_fields = ('user__username', 'user__fullname',
+    search_fields = ('user__username', 'user__full_name',
                      'user__email', 'group__name')
     list_display = ('group', 'user', 'is_active')
     autocomplete_fields = ('group', 'user',)
@@ -393,12 +399,13 @@ class GroupUserAdmin(ModelAdmin):
 
 
 class StudentAdmin(ModelAdmin):
-    search_fields = ('user__username', 'user__fullname', 'user__email',)
+    search_fields = ('user__username', 'user__full_name', 'user__email',)
     # list_filter = ('gender',)
     autocomplete_fields = ('user',)
-    list_display = ('username', 'fullname', 'email', 'phone')
+    list_display = ('username', 'full_name', 'email', 'phone')
     filter_horizontal = ('skills', 'industries')
     actions = ('export_as_xlsx',)
+    date_hierarchy = 'user__date_joined'
 
     change_list_template = 'core/students/change_list.html'
     student_import_template = "core/students/import.html"
@@ -420,14 +427,14 @@ class StudentAdmin(ModelAdmin):
     username.admin_order_field = 'user__username'
 
     def email(self, instance):
-        return instance.user
+        return instance.user.email
 
     email.admin_order_field = 'user__email'
 
-    def fullname(self, instance):
+    def full_name(self, instance):
         return instance.user.full_name
 
-    fullname.admin_order_field = 'user__fullname'
+    full_name.admin_order_field = 'user__full_name'
 
     def export_as_xlsx(self, request, queryset):
         results = business.dump_student_to_xlsx(queryset)

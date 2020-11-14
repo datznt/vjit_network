@@ -255,6 +255,8 @@ EMAIL_HOST_PASSWORD = 'dat2741998'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# CORS
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://127.0.0.1:3000',
@@ -262,10 +264,20 @@ CORS_ORIGIN_WHITELIST = (
     'https://vjit.surge.sh',
 )
 
-THUMBNAIL_DIMENTIONS = [(100, 100), (780, 780), (1024, 1024)]
-
 INTERNAL_IPS = [
     '127.0.0.1',
+]
+
+# File
+THUMBNAIL_DIMENTIONS = [(100, 100), (780, 780), (1024, 1024)]
+FILE_MAX_SIZE = 10485760 # 10MB
+FILE_ALLOWED_EXTENTIONS = [
+    # documents
+    'doc', 'docx', 'ppt', 'pptx', 'pdf',
+    # videos
+    'avi', 'flv', 'mkv', 'mp4', 'wmv', 'vob',
+    # images
+    'jpg', 'jpeg', 'gif', 'png', 'tiff', 'bmp'
 ]
 
 # ONESIGNAL
@@ -277,7 +289,6 @@ GRAPPELLI_INDEX_DASHBOARD = {
     'django.contrib.admin.site': 'vjit_network.core.admin.MyDashboard'}
 GRAPPELLI_ADMIN_TITLE = 'VJIT Alumni'
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # OTP
 OTP_CODE_FROM = 1111

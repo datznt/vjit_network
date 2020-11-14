@@ -24,11 +24,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework.pagination import PageNumberPagination
 
-
 from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode
 from vjit_network.api.models import NotificationTemplate, NotificationTemplateLocalization, Notification, UserNotification, Device
 from vjit_network.api.bussines import otp_code_for_user
 from vjit_network.common.mixins import LoggingViewSetMixin
+from vjit_network.common.views import MethodSerializerView
+from vjit_network.common.permissions import IsActive
+
 from vjit_network.api import serializers, permissions, utils, filtersets
 
 from wsgiref.util import FileWrapper
@@ -37,9 +39,13 @@ import re
 
 MAIL_SENDER = settings.EMAIL_HOST_USER
 
+FULL_METHODS_VIEWSET = ('list', 'create', 'retrieve',
+                        'update',  'partial_update', 'destroy')
+
 
 class UserViewSet(
-        mixins.ListModelMixin, mixins.UpdateModelMixin, 
+        MethodSerializerView,
+        mixins.ListModelMixin, mixins.UpdateModelMixin,
         viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -54,26 +60,22 @@ class UserViewSet(
     queryset = User.objects.all()
     permission_classes = (permissions.UserPermission,)
     serializer_classes = {
-        'list': serializers.UserSerializer,
-        'retrieve': serializers.UserSerializer,
-        'update': serializers.UserSerializer,
-        'partial_update': serializers.UserSerializer,
-        'session_user': serializers.SessionUserSerializer,
-        'news_feed': serializers.PostSerializer,
-        'files': serializers.FileSerializer
+        ('list', 'retrieve', 'partial_update', 'update'): serializers.UserSerializer,
+        ('session_user',): serializers.SessionUserSerializer,
+        ('news_feed',): serializers.PostSerializer,
+        ('files',): serializers.FileSerializer
     }
 
-    @action(methods=['GET'], detail=False, url_path='session-user', permission_classes=[IsAuthenticated, ])
+    @action(methods=['GET'], detail=False, url_path='session-user', permission_classes=[IsAuthenticated & IsActive])
     def session_user(self, request):
         user_auth = request.user
-        if not (user_auth.is_authenticated and user_auth.is_active):
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
         VisitLogger.increment_for_user(user=user_auth)
         user_data = self.get_serializer(user_auth).data
         serializer_data = {'user': user_data}
         return Response(data=serializer_data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False, url_path='news-feed', url_name='news_feed', permission_classes=[IsAuthenticated, ])
+    @method_decorator(cache_page(60 * 5))
     def news_feed(self, request):
         user_req = request.user
         groups_user_is_member = user_req.group_members.all().values_list('group', flat=True)
@@ -101,16 +103,8 @@ class UserViewSet(
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
-        if not isinstance(self.serializer_classes, dict):
-            raise ImproperlyConfigured(
-                "serializer_classes should be a dict mapping.")
-        if self.action in self.serializer_classes.keys():
-            return self.serializer_classes[self.action]
-        return super().get_serializer_class()
 
-
-class AuthViewSet(viewsets.GenericViewSet):
+class AuthViewSet(MethodSerializerView, viewsets.GenericViewSet):
     permission_classes = [AllowAny, ]
     serializer_class = serializers.EmptySerializer
     serializer_classes = {
@@ -120,7 +114,10 @@ class AuthViewSet(viewsets.GenericViewSet):
         'password_reset': serializers.PasswordResetSerializer,
         'password_reset_verify': serializers.VerificationOTPSerializer,
         'password_reset_renew': serializers.PasswordRenewSerializer,
+        'logout': serializers.EmptySerializer
     }
+    reset_pwd_subject_template_name = 'core/password_reset_subject.txt'
+    reset_pwd_email_template_name = 'core/acc_password_reset_otp.html'
 
     @action(methods=['POST', ], detail=False)
     def login(self, request):
@@ -163,8 +160,8 @@ class AuthViewSet(viewsets.GenericViewSet):
         user_has_email = next(password_reset_form.get_users(email_validated))
         new_otp = otp_code_for_user(user_has_email)
         password_reset_form.send_mail(
-            subject_template_name='core/password_reset_subject.txt',
-            email_template_name='core/acc_password_reset_otp.html',
+            subject_template_name=self.reset_pwd_subject_template_name,
+            email_template_name=self.reset_pwd_email_template_name,
             from_email=MAIL_SENDER,
             to_email=email_validated,
             context={'otp': new_otp.code, 'site_name': 'VJIT Alumni'}
@@ -192,14 +189,6 @@ class AuthViewSet(viewsets.GenericViewSet):
         req_user.save()
         return Response(status=status.HTTP_200_OK)
 
-    def get_serializer_class(self):
-        if not isinstance(self.serializer_classes, dict):
-            raise ImproperlyConfigured(
-                "serializer_classes should be a dict mapping.")
-        if self.action in self.serializer_classes.keys():
-            return self.serializer_classes[self.action]
-        return super().get_serializer_class()
-
 
 class UserSettingViewSet(
         mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
@@ -214,6 +203,7 @@ class UserSettingViewSet(
 
 
 class GroupViewSet(
+        MethodSerializerView,
         mixins.ListModelMixin, mixins.UpdateModelMixin,
         mixins.CreateModelMixin, mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
@@ -225,14 +215,9 @@ class GroupViewSet(
     lookup_field = 'slug'
     serializer_class = serializers.EmptySerializer
     serializer_classes = {
-        'list': serializers.GroupSerializer,
-        'create': serializers.GroupSerializer,
-        'retrieve': serializers.GroupSerializer,
-        'update': serializers.GroupSerializer,
-        'partial_update': serializers.GroupSerializer,
-        'destroy': serializers.GroupSerializer,
-        'posts': serializers.PostSerializer,
-        'files': serializers.FileSerializer
+        FULL_METHODS_VIEWSET: serializers.GroupSerializer,
+        ('posts',): serializers.PostSerializer,
+        ('files',): serializers.FileSerializer
     }
     permission_classes = (permissions.GroupPermission,)
     filter_backends = (filters.DjangoFilterBackend,)
@@ -266,14 +251,6 @@ class GroupViewSet(
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
-        if not isinstance(self.serializer_classes, dict):
-            raise ImproperlyConfigured(
-                "serializer_classes should be a dict mapping.")
-        if self.action in self.serializer_classes.keys():
-            return self.serializer_classes[self.action]
-        return super().get_serializer_class()
-
     def perform_create(self, serializer):
         serializer.save(create_by=self.request.user)
 
@@ -292,8 +269,7 @@ class GroupUserViewSet(
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.GroupMemberFilter
-    search_fields = ('user__username', 'user__last_name',
-                     'user__email', 'user__first_name',)
+    search_fields = ('user__username', 'user__full_name', 'user__email', )
     queryset = GroupUser.objects.all()
 
 
@@ -318,6 +294,8 @@ class FileViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if not self.request:
+            return File.objects.none()
         return qs.filter(create_by=self.request.user)
 
 
@@ -336,7 +314,7 @@ class PostViewSet(
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.PostFilter
-    search_fields = ('content', 'create_by__username', 'create_by__last_name',)
+    search_fields = ('content', 'create_by__username', 'create_by__full_name',)
 
 
 class ViewViewSet(
@@ -353,12 +331,13 @@ class ViewViewSet(
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.ViewFilterSet
-    search_fields = ('create_by__username', 'create_by__last_name',)
+    search_fields = ('create_by__username', 'create_by__full_name',)
 
     def get_queryset(self):
         qs = super().get_queryset()
-        blockers = BlockUser.objects.as_user(
-            self.request.user, to_list_user=True)
+        if not self.request:
+            return qs
+        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
 
@@ -377,7 +356,7 @@ class CommentViewSet(
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.CommentFilter
-    search_fields = ('create_by__username', 'create_by__last_name',)
+    search_fields = ('create_by__username', 'create_by__full_name',)
 
     def perform_create(self, serializer):
         serializer.validated_data['create_by'] = self.request.user
@@ -385,8 +364,9 @@ class CommentViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
-        blockers = BlockUser.objects.as_user(
-            self.request.user, to_list_user=True)
+        if not self.request:
+            return qs
+        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
 
@@ -487,6 +467,8 @@ class UserNotificationViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if not self.request:
+            return qs
         return qs.filter(user=self.request.user)
 
 
@@ -508,6 +490,8 @@ class UserDeviceViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if not self.request:
+            return qs
         return qs.filter(user=self.request.user)
 
 
@@ -555,4 +539,6 @@ class BlockUserViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if not self.request:
+            return qs
         return qs.filter(create_by=self.request.user)

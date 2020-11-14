@@ -17,7 +17,7 @@ class CommentFilter(filters.FilterSet):
 class UserFilter(filters.FilterSet):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name',]
+        fields = ['username', 'email', 'full_name',]
 
 
 class ViewFilterSet(filters.FilterSet):

@@ -137,11 +137,6 @@ class UserSerializer(FlexFieldsModelSerializer):
             'join_groups': ('vjit_network.api.GroupSerializer', {'many': True, }),
         }
 
-    # def get_full_name(self, obj):
-    #     full_name = obj.first_name + ' ' + obj.last_name
-    #     full_name = full_name.strip()
-    #     return full_name if full_name != '' else '@'+obj.username if obj.username else obj.email
-
     def _get_user_request(self):
         request = self.context.get('request', None)
         if request and hasattr(request, 'user'):
@@ -521,3 +516,7 @@ class PasswordRenewSerializer(serializers.Serializer):
     def validate_password(self, value):
         password_validation.validate_password(value)
         return value
+
+
+class LogoutSerializer(serializers.Serializer):
+    message = serializers.CharField(required=False)

@@ -41,7 +41,7 @@ class AdminDashboardView(View):
                 'user_type_statistics': user_type_statistics
             }
             cache.set('dashboard_statistics',
-                      dashboard_statistics, 60 * 60 * 24)
+                      dashboard_statistics, 60 * 60 * 2)
         return JsonResponse({
             'charts': dashboard_statistics
         })

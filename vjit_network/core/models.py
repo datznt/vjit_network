@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.utils.text import slugify
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator, FileExtensionValidator
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse_lazy
 from django.forms import ValidationError
@@ -23,6 +23,7 @@ from ckeditor.fields import RichTextField
 
 from vjit_network.core import manager, customfields, utils
 from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel, IsActiveModel
+from vjit_network.common.validators import FileMaxSizeValidator
 
 import json
 import uuid
@@ -33,7 +34,8 @@ storage = FileSystemStorage(location=settings.MEDIA_ROOT)
 
 OTP_CODE_FROM = settings.OTP_CODE_FROM
 OTP_CODE_TO = settings.OTP_CODE_TO
-
+FILE_ALLOWED_EXTENTIONS = settings.FILE_ALLOWED_EXTENTIONS
+FILE_MAX_SIZE = settings.FILE_MAX_SIZE
 
 class EmploymentTypeChoices(models.TextChoices):
     FULL_TIME = 'full_time', _('Full-time')
@@ -97,7 +99,11 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
     raw = models.FileField(
         verbose_name=_('File raw'), max_length=500,
         storage=storage, upload_to=raw_directory_path,
-        help_text=_("The original file is uploaded from the client")
+        help_text=_("The original file is uploaded from the client"),
+        validators=[
+            FileExtensionValidator(allowed_extensions=FILE_ALLOWED_EXTENTIONS),
+            FileMaxSizeValidator(max_size=FILE_MAX_SIZE)
+        ]
     )
     thumbnails = JSONField(
         verbose_name=_('Thumbnails'), encoder=json.JSONEncoder, null=True, blank=True,
@@ -143,6 +149,12 @@ class User(BigIntPrimary, AbstractUser, PerfectModel):
         (FEMALE, _("Female")),
         (UNKNOWN, _("Unknown")),
     ]
+    full_name = models.CharField(
+        verbose_name=_('Full name'),
+        null=True,
+        blank=True,
+        max_length = 131
+    )
     avatar = models.OneToOneField(
         verbose_name=_('Avatar'),
         to=File,
@@ -182,15 +194,14 @@ class User(BigIntPrimary, AbstractUser, PerfectModel):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
-    @property
-    def full_name(self):
-        full_name = ' '.join([self.first_name, self.last_name])
+    def get_fullname(self):
+        full_name = ' '.join([self.last_name, self.first_name])
         full_name = full_name.strip()
         return full_name if full_name != '' else '@'+self.username
 
-    @property
-    def channel_name(self):
-        return "user_%s" % self.id
+    def save(self, *args, **kwargs):
+        self.full_name = self.get_fullname()
+        super().save(*args, **kwargs)
 
 
 class BlockUser(UUIDPrimaryModel, IsActiveModel, PerfectModel):
