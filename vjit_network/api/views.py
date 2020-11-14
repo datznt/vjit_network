@@ -372,6 +372,7 @@ class CommentViewSet(
 
 class StudentViewSet(
         mixins.ListModelMixin, mixins.UpdateModelMixin,
+        mixins.RetrieveModelMixin,
         mixins.CreateModelMixin, viewsets.GenericViewSet):
     ordering = ['-user']
     lookup_field = 'user'
