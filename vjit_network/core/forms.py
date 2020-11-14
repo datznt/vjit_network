@@ -65,7 +65,10 @@ class StudentUploadForm(forms.Form):
 
     def get_student_from_row(self, row):
         birth_date = row.get('birth_date', None)
-        birth_date = birth_date.date() if birth_date else ''
+        if not pd.isna(birth_date) and hasattr(birth_date, 'date'):
+            birth_date = birth_date.date()
+        else:
+            birth_date = ''
         return {
             'phone': str(row.get('phone', ''),),
             'birth_date': birth_date,
