@@ -1,5 +1,6 @@
 from django.db.models import QuerySet
-from vjit_network.core.models import Student, Education
+from autoslug.settings import slugify
+from vjit_network.core.models import Student, Education, Group, User, GroupUser
 from typing import List, TypeVar, Generic
 import pandas as pd
 
@@ -127,3 +128,31 @@ def dump_student_to_xlsx(queryset: QuerySet):
 
     converter = StudentExportConvert(StudentExport)
     return converter.to_xlsx(list_student)
+
+
+def lookup_groups_from_class_id(defaults: List[str], class_id: str):
+    list_slugs = defaults
+    if isinstance(class_id, str) and class_id:
+        class_id = class_id.strip()
+        if len(class_id) == 8:
+            start_year, major_year, major = class_id[:2], class_id[:6], class_id[3:6]
+            # 15DCKJ01
+            list_slugs.extend([
+                major,           #CKJ 
+                major_year,      #15DCKJ
+                start_year,      #15
+                class_id         #15DCKJ01
+            ])
+    list_slugs = list(map(lambda    x: slugify(x), list_slugs))
+    return Group.objects.filter(slug__in=list_slugs)
+
+
+def join_user_to_groups(user: User, groups: List[Group]):
+    for group in groups:
+        if not isinstance(group, Group):
+            continue
+        group_members = group.group_members
+
+        is_member: bool = group_members.filter(user=user).exists()
+        if not is_member:
+            group_members.create(user=user, is_active=True)

@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import status
 from vjit_network.core.models import User, VisitLogger, Student, Education
 from vjit_network.core.forms import UserCreationForm, StudentCreationForm, EducationCreationForm
+from vjit_network.core.business import lookup_groups_from_class_id, join_user_to_groups
 import os
 import json
 import logging
@@ -99,8 +100,9 @@ class StudentCreateView(View):
             if not user_form.is_valid():
                 raise ValidationError(user_form.errors)
             user_instance: User = user_form.save()
+            user_instance.set_password(user_instance.password)
             user_instance.update_fields(is_student=True)
-            
+
             student_form = StudentCreationForm({
                 **resq_data.get('student', {}),
                 'user':  user_instance.pk
@@ -118,6 +120,11 @@ class StudentCreateView(View):
                 raise ValidationError(education_form.errors)
 
             education_instance: Education = education_form.save()
+            groups_need_add = lookup_groups_from_class_id(
+                ['vjit'], education_instance.class_id)
+            
+            join_user_to_groups(user_instance, groups_need_add)
+
         except ValidationError as exception:
             return HttpResponseBadRequest(exception)
         except Exception as exception:
