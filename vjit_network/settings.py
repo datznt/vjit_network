@@ -270,7 +270,7 @@ INTERNAL_IPS = [
 
 # File
 THUMBNAIL_DIMENTIONS = [(100, 100), (780, 780), (1024, 1024)]
-FILE_MAX_SIZE = 10485760 # 10MB
+FILE_MAX_SIZE = 15728640 # 10MB
 FILE_ALLOWED_EXTENTIONS = [
     # documents
     'doc', 'docx', 'ppt', 'pptx', 'pdf',
