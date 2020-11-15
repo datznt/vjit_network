@@ -130,4 +130,6 @@ class StudentCreateView(View):
         except Exception as exception:
             if user_instance:
                 user_instance.delete()
+            logger.exception(exception)
+            raise exception
         return HttpResponse(status=status.HTTP_201_CREATED)

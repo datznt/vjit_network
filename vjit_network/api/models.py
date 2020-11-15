@@ -72,8 +72,9 @@ class NotificationTemplateLocalization(PerfectModel):
     notification_template = models.ForeignKey(
         NotificationTemplate, on_delete=models.CASCADE, related_name='localizations')
     language = models.CharField(
-        verbose_name=_('Language'), max_length=2, default='vi', choices=settings.LANGUAGES,
-
+        verbose_name=_('Language'), 
+        max_length=2, 
+        default='vi', choices=settings.LANGUAGES,
     )
     title_html = RichTextField(verbose_name=_(
         'Title format html'), default=None)
@@ -88,6 +89,7 @@ class NotificationTemplateLocalization(PerfectModel):
         unique_together = ('notification_template', 'language')
         verbose_name = _('Notification template localization')
         verbose_name_plural = _('Notification template localizations')
+
 
 class UserNotification(UUIDPrimaryModel, PerfectModel):
     user = models.ForeignKey(
@@ -148,21 +150,35 @@ class UserNotification(UUIDPrimaryModel, PerfectModel):
 
 class Notification(UUIDPrimaryModel, PerfectModel):
     actor = models.ForeignKey(
-        verbose_name=_('Actor'), to=User, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_actor',
-
+        verbose_name=_('Actor'),
+        to=User,
+        on_delete=models.CASCADE,
+        null=True, blank=False,
+        to_field='id', related_name='notifications_actor',
     )
     template = models.ForeignKey(
-        verbose_name=_('Notification template'), to=NotificationTemplate, on_delete=models.CASCADE, null=True, blank=False, to_field='id', related_name='notifications_created',
+        verbose_name=_('Notification template'),
+        to=NotificationTemplate,
+        on_delete=models.CASCADE,
+        null=True, blank=False,
+        to_field='id', related_name='notifications_created',
     )
     create_at = models.DateTimeField(
-        verbose_name=_('Creation time'), auto_now_add=True,
+        verbose_name=_('Creation time'),
+        auto_now_add=True,
     )
     payload = JSONField(
-        verbose_name=_('Payload'), encoder=json.JSONEncoder, null=True, blank=True,
+        verbose_name=_('Payload'),
+        encoder=json.JSONEncoder,
+        null=True, blank=True,
         help_text=_('Data send with notification')
     )
     recipients = models.ManyToManyField(
         User, related_name="notifications", through=UserNotification)
+    is_publish = models.BooleanField(
+        verbose_name=_('Send the message to the client'),
+        default=False
+    )
 
     class Meta:
         verbose_name = _('Notification')

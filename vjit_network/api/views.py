@@ -67,6 +67,7 @@ class UserViewSet(
     }
 
     @action(methods=['GET'], detail=False, url_path='session-user', permission_classes=[IsAuthenticated & IsActive])
+    @method_decorator(cache_page(60 * 1))
     def session_user(self, request):
         user_auth = request.user
         VisitLogger.increment_for_user(user=user_auth)
@@ -75,7 +76,7 @@ class UserViewSet(
         return Response(data=serializer_data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False, url_path='news-feed', url_name='news_feed', permission_classes=[IsAuthenticated, ])
-    @method_decorator(cache_page(60 * 5))
+    @method_decorator(cache_page(60 * 1))
     def news_feed(self, request):
         user_req = request.user
         groups_user_is_member = user_req.group_members.all().values_list('group', flat=True)
@@ -226,6 +227,7 @@ class GroupViewSet(
     queryset = Group.objects.all()
 
     @action(methods=['GET'], detail=True, url_path='posts', permission_classes=[IsAuthenticated, ])
+    @method_decorator(cache_page(60 * 1))
     def posts(self, request, slug=None):
         # user_req = request.user
         instance = self.get_object()
@@ -240,6 +242,7 @@ class GroupViewSet(
         return Response(serializer.data)
 
     @action(methods=['GET'], detail=True, url_path='files', permission_classes=[IsAuthenticated, ])
+    @method_decorator(cache_page(60 * 1))
     def files(self, request, slug=None):
         instance = self.get_object()
         qs = instance.get_files()
@@ -341,6 +344,10 @@ class ViewViewSet(mixins.RetrieveModelMixin,
             self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
+    @method_decorator(cache_page(60 * 5))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class CommentViewSet(mixins.RetrieveModelMixin,
                      mixins.ListModelMixin, mixins.UpdateModelMixin,
@@ -371,6 +378,9 @@ class CommentViewSet(mixins.RetrieveModelMixin,
             self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
+    @method_decorator(cache_page(60 * 1))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class StudentViewSet(
         mixins.ListModelMixin, mixins.UpdateModelMixin,
@@ -474,6 +484,9 @@ class UserNotificationViewSet(mixins.RetrieveModelMixin,
             return qs
         return qs.filter(user=self.request.user)
 
+    @method_decorator(cache_page(60 * 1))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class UserDeviceViewSet(mixins.RetrieveModelMixin,
                         mixins.ListModelMixin, mixins.UpdateModelMixin,

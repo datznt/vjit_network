@@ -2,71 +2,56 @@ from functools import reduce
 from django.db.models.signals import (post_save, post_delete, pre_save)
 from django.dispatch import receiver
 from django.conf import settings
-from asgiref.sync import async_to_sync as _
-from vjit_network.core.models import Comment, Post 
+from vjit_network.core.models import Comment, Post, User
 from vjit_network.api.models import UserNotification, Notification, NotificationTemplate
 from vjit_network.api import serializers
+from vjit_network.api.push_notification import send
+from vjit_network.api.utils import NotificationBuilder
 from onesignal import OneSignal, DeviceNotification
 
 notify = OneSignal(settings.ONESIGNAL_APP_ID, settings.ONESIGNAL_REST_API_KEY)
 
-@receiver(post_save, sender=UserNotification)
-def user_notification_on_post_create(sender, instance, created, **kwargs):
-    if created:
-        # render template
-        payload = instance.get_payload()
-        player_ids = instance.user.devices.filter(
-            active=True).values_list('player_id', flat=True)
+TEMPLATE_COMMENT = 4
+TEMPLATE_COMMENT_REPLY = 5
+TEMPLATE_POST_ACCEPT_ALL_MEMBER = 6
+TEMPLATE_POST_ACCEPT_CREATE_BY = 8
+TEMPLATE_POST_WAITING = 7
+TEMPLATE_POST_DISSENT = 9
 
-        if player_ids:
-            notification = DeviceNotification(
-                include_player_ids=list(player_ids),
-                include_external_user_ids=[],
-                contents={
-                    "en": payload['content']
-                }, headings={
-                    "en": payload['title']
-                },
-                url=payload['launch_url'],
-                chrome_web_icon=payload['icon'],
-                firefox_icon=payload['icon'],
-                chrome_web_image=payload['image'],
-                small_icon=payload['icon'],
-                big_picture=payload['image'],
-                priority=10,
-                android_channel_id=settings.ONESINGAL_ANDROID_CHANNEL_ID,
-            )
-            notify.send(notification)
+
+@receiver(post_save, sender=Notification)
+def notification_on_post_save(sender, instance, created, **kwargs):
+    if instance.is_publish:
+        send(instance)
 
 
 @receiver(post_save, sender=Comment)
 def comment_on_create_or_update(sender, instance, created, **kwargs):
-    if created and instance.content_object and isinstance(instance.content_object, Post):
+    if not created:
+        return
+    if isinstance(instance.content_object, Post):
         if instance.parent is None:
             notification_recipient = instance.content_object.create_by
         else:
             notification_recipient = instance.parent.create_by
         if notification_recipient == instance.create_by:
             return
+        notification_actor = instance.create_by
         if instance.parent is None:
-            new_notification = Notification.objects.create(
-                actor=instance.create_by,
-                template=NotificationTemplate.objects.get(pk=4),
-                payload=serializers.CommentSerializer(
-                    instance, fields=['id', 'content', 'object_id']
-                ).data
-            )
+            notification_template_id = TEMPLATE_COMMENT
+            payload_fields = ['id', 'content', 'object_id']
         else:
-            new_notification = Notification.objects.create(
-                actor=instance.create_by,
-                template=NotificationTemplate.objects.get(pk=5),
-                payload=serializers.CommentSerializer(
-                    instance, fields=['id', 'content', 'object_id', 'parent']
-                ).data
-            )
-        UserNotification.objects.create(
-            user=notification_recipient,
-            notification=new_notification
+            notification_template_id = TEMPLATE_COMMENT_REPLY
+            payload_fields = ['id', 'content', 'object_id', 'parent']
+
+        notification_payload = serializers.CommentSerializer(
+            instance, fields=payload_fields).data
+
+        NotificationBuilder.push(
+            actor=notification_actor,
+            template_id=notification_template_id,
+            payload=notification_payload,
+            recipients=[notification_recipient]
         )
 
 
@@ -83,53 +68,49 @@ def post_on_pre_save(sender, instance, raw, **kwargs):
 
 
 @receiver(post_save, sender=Post)
-def post_on_create_or_update(sender, instance, created, **kwargs):
+def post_on_post_save(sender, instance, created, **kwargs):
     post_fields = {
         'fields': ['id', 'content', 'icon', 'title',
                    'sub_title', 'group.id', 'group.name', 'group.slug'],
         'expand': ['group']
     }
+    notification_payload = serializers.PostSerializer(
+        instance, **post_fields).data
     if created:
-        if instance.public_code == Post.PublicCode.WAITING:
-            UserNotification.objects.create(
-                user=instance.group.create_by,
-                notification=Notification.objects.create(
-                    actor=instance.create_by,
-                    template=NotificationTemplate.objects.get(pk=7),
-                    payload=serializers.PostSerializer(
-                        instance, **post_fields).data
-                )
-            )
+        system_admins = User.objects.filter(is_staff=True, is_active=True)
+        NotificationBuilder.push(
+            actor=instance.create_by,
+            template_id=TEMPLATE_POST_WAITING,
+            payload=notification_payload,
+            recipients=system_admins
+        )
     else:
-        if "public_code" in instance.update_fields:
-            if instance.public_code == Post.PublicCode.ACCEPT:
-                # send to all members in group
-                new_notification = Notification.objects.create(
-                    actor=instance.create_by,
-                    template=NotificationTemplate.objects.get(pk=6),
-                    payload=serializers.PostSerializer(instance, **post_fields).data
-                )
-                users_in_group = instance.group.group_members.filter(
-                    is_active=True).exclude(user=instance.create_by)
-                notification_recipients = [UserNotification(
-                    user=member.user, notification=new_notification) for member in users_in_group]
-                UserNotification.objects.bulk_create(
-                    notification_recipients)
-                # send to post create by
-                UserNotification.objects.create(
-                    user=instance.create_by,
-                    notification=Notification.objects.create(
-                        actor=instance.create_by,
-                        template=NotificationTemplate.objects.get(pk=8),
-                        payload=serializers.PostSerializer(instance, **post_fields).data
-                    )
-                )
-            elif instance.public_code == Post.PublicCode.WAITING:
-                UserNotification.objects.create(
-                    user=instance.create_by,
-                    notification=Notification.objects.create(
-                        actor=instance.create_by,
-                        template=NotificationTemplate.objects.get(pk=9),
-                        payload=serializers.PostSerializer(instance, **post_fields).data
-                    )
-                )
+        if "public_code" not in instance.update_fields:
+            return
+        if instance.public_code == Post.PublicCode.ACCEPT:
+            # send to all members in group
+            group_members = instance.group.group_members
+            users_in_group = group_members.filter(
+                is_active=True).exclude(user=instance.create_by)
+
+            NotificationBuilder.push(
+                actor=instance.create_by,
+                template_id=TEMPLATE_POST_ACCEPT_ALL_MEMBER,
+                payload=notification_payload,
+                recipients=users_in_group
+            )
+
+            # send to post create by
+            NotificationBuilder.push(
+                actor=instance.create_by,
+                template_id=TEMPLATE_POST_ACCEPT_CREATE_BY,
+                payload=notification_payload,
+                recipients=[instance.create_by]
+            )
+        elif instance.public_code == Post.PublicCode.DISSENT:
+            NotificationBuilder.push(
+                actor=instance.create_by,
+                template_id=TEMPLATE_POST_DISSENT,
+                payload=notification_payload,
+                recipients=[instance.create_by]
+            )
