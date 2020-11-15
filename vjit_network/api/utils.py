@@ -74,10 +74,11 @@ class NotificationBuilder:
     def _push_notification(self):
         try:
             new_notification = Notification.objects.create(
-                actor=self.actor, template=self.template, payload=self.payload, is_publish=is_publish)
+                actor=self.actor, template=self.template, payload=self.payload, is_publish=False)
             notification_recipients = [UserNotification(
                 user=recipient, notification=new_notification) for recipient in self.recipients]
             UserNotification.objects.bulk_create(notification_recipients)
+            new_notification.update_fields(is_publish=self.is_publish)
             return new_notification
         except Exception as exception:
             logger.exception(exception)

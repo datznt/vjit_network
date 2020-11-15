@@ -15,14 +15,17 @@ def send(notification: Notification) -> bool:
     send notification instance to all devices of client
     """
     recipients = UserNotification.objects.filter(
-        notification=notification, user__is_active=True)
+        notification=notification)
     for recipient in recipients:
         user_instance: User = recipient.user
         notification_payload = recipient.get_payload()
         player_ids = user_instance.devices.filter(
             active=True).values_list('player_id', flat=True)
+        include_player_ids = list(player_ids)
+        if len(include_player_ids) == 0:
+            continue
         device_notification = DeviceNotification(
-            include_player_ids=list(player_ids),
+            include_player_ids=include_player_ids,
             include_external_user_ids=[],
             contents={"en": notification_payload['content']},
             headings={"en": notification_payload['title']},
@@ -35,4 +38,5 @@ def send(notification: Notification) -> bool:
             priority=10,
             android_channel_id=ONESINGAL_ANDROID_CHANNEL_ID,
         )
-        notify.send(device_notification)
+        resp = notify.send(device_notification)
+        print(resp)

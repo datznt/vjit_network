@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from django.contrib.contenttypes.models import ContentType
 from vjit_network.api.models import Notification, NotificationSetting, UserNotification, NotificationTemplate, NotificationTemplateLocalization, Device
+from vjit_network.api.forms import NotificationForm
 # Register your models here.
 
 
@@ -40,15 +41,18 @@ class NotificationAdmin(admin.ModelAdmin):
     search_fields = ('id', 'actor', 'template', 'create_at')
     list_display = ('id', 'actor','template','create_at')
     list_per_page = 10
+    autocomplete_fields = ('actor', )
+    filter_horizontal = ('recipients',)
+    form = NotificationForm
 
-    class user_notification_inline(admin.TabularInline):
-        model = UserNotification
-        fields = ('user', 'is_read')
-        # readonly_fields = ('id',)
-        autocomplete_fields = ('user',)
-        # extra = 1
+    # class user_notification_inline(admin.TabularInline):
+    #     model = UserNotification
+    #     fields = ('user', 'is_read')
+    #     # readonly_fields = ('id',)
+    #     autocomplete_fields = ('user',)
+    #     # extra = 1
 
-    inlines = [user_notification_inline]
+    # inlines = [user_notification_inline]
 
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(NotificationTemplate, NotificationTemplateAdmin)

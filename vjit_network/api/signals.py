@@ -21,7 +21,7 @@ TEMPLATE_POST_DISSENT = 9
 
 @receiver(post_save, sender=Notification)
 def notification_on_post_save(sender, instance, created, **kwargs):
-    if instance.is_publish:
+    if not created and instance.is_publish:
         send(instance)
 
 
