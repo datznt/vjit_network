@@ -67,7 +67,6 @@ class UserViewSet(
     }
 
     @action(methods=['GET'], detail=False, url_path='session-user', permission_classes=[IsAuthenticated & IsActive])
-    @method_decorator(cache_page(60 * 1))
     def session_user(self, request):
         user_auth = request.user
         VisitLogger.increment_for_user(user=user_auth)

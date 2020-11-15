@@ -39,4 +39,3 @@ def send(notification: Notification) -> bool:
             android_channel_id=ONESINGAL_ANDROID_CHANNEL_ID,
         )
         resp = notify.send(device_notification)
-        print(resp)
