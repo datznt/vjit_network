@@ -7,6 +7,10 @@ from cv2 import cv2
 from urllib.parse import urljoin
 import mimetypes as mt
 import os
+import logging
+
+# create logger instance
+logger = logging.getLogger(__name__)
 
 def create_thumbnail(source, storage, dimensions) -> (bool, Image):
     _result, _thumbnails, file_type = False, None, None
@@ -61,7 +65,7 @@ def create_thumbnail(source, storage, dimensions) -> (bool, Image):
         
         return (_result, _thumbnails, file_type)
     except Exception as e:
-        print(str(e))
+        logger.exception(e)
         return _result, _thumbnails, file_type
 
 def save_thumbnail(image: Image, path) -> bool:
@@ -71,7 +75,7 @@ def save_thumbnail(image: Image, path) -> bool:
         image.save(path)
         return True
     except Exception as e:
-        print(str(e))
+        logger.exception(e)
         return False
 
 def save_thumbnails(thumbnails, file_modal, file_type):

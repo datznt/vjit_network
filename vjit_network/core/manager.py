@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.functions import Concat, Coalesce, Trim, NullIf
 from django.contrib.auth import models as auth_models
-
+from django.core.cache import cache
 
 class UserManager(auth_models.UserManager):
     pass
@@ -24,7 +24,18 @@ class BlockUserManager(models.Manager):
         """
         Find all user blocked by me
         """
-        qs = super().get_queryset().filter(create_by=user, is_active=True)
-        if to_list_user:
-            qs = qs.values_list('create_by', flat=True)
+        cache_key = self._cache_key(user, to_list_user)
+        qs = cache.get(cache_key)
+        if not qs:
+            qs = super().get_queryset().filter(create_by=user, is_active=True)
+            if to_list_user:
+                qs = qs.values_list('create_by', flat=True)
+            cache.set(cache_key, qs, 60)
         return qs
+
+    def _cache_key(self, user, to_list_user=False):
+        return '_'.join([
+            user.cache_key,
+            'blocklist',
+            'flat' if to_list_user else 'noflat'
+        ])

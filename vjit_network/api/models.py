@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import JSONField
 from django.template import Template, Context
 from django.contrib.sites.models import Site
 from vjit_network.core.models import UserSetting
-from vjit_network.common.models import UUIDPrimaryModel, PerfectModel
+from vjit_network.common.models import UUIDPrimaryModel, PerfectModel, CacheKeyModel
 from ckeditor.fields import RichTextField
 
 import uuid
@@ -91,7 +91,7 @@ class NotificationTemplateLocalization(PerfectModel):
         verbose_name_plural = _('Notification template localizations')
 
 
-class UserNotification(UUIDPrimaryModel, PerfectModel):
+class UserNotification(UUIDPrimaryModel, PerfectModel, CacheKeyModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="notifications_user")
     notification = models.ForeignKey(

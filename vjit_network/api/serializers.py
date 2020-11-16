@@ -14,6 +14,7 @@ from django.contrib.auth.models import BaseUserManager
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 
 from rest_framework_cache.registry import cache_registry
 from rest_framework_cache.serializers import CachedSerializerMixin
@@ -101,17 +102,25 @@ class FileSerializer(FlexFieldsModelSerializer):
             'attach_posts': ('vjit_network.api.AttachPostSerializer', {'many': True, }),
         }
 
-    def get_thumbnails(self, instance):
+    def get_thumbnails(self, instance: File):
         if not instance.thumbnails:
             return None
-        storage = instance.raw.storage
-        default_site_setting = Site.objects.get_current()
-        relative_url = storage.url(instance.thumbnails['path'])
-        absolute_url = urljoin(default_site_setting.domain, relative_url)
-        return {
-            'location': absolute_url,
-            'nodes': instance.thumbnails['thumbs'],
-        }
+        cache_key = self._thumbnails_cache_key(instance)
+        thumbnails = cache.get(cache_key)
+        if not thumbnails:
+            storage = instance.raw.storage
+            default_site_setting = Site.objects.get_current()
+            relative_url = storage.url(instance.thumbnails['path'])
+            absolute_url = urljoin(default_site_setting.domain, relative_url)
+            thumbnails = {
+                'location': absolute_url,
+                'nodes': instance.thumbnails['thumbs'],
+            }
+            cache.set(cache_key, thumbnails, 60 * 1)
+        return thumbnails
+
+    def _thumbnails_cache_key(self, file: File):
+        return file.cache_key + '_thumbs'
 
 
 class TagSerializer(FlexFieldsModelSerializer):
@@ -208,9 +217,16 @@ class GroupSerializer(FlexFieldsModelSerializer):
     def get_my_info(self, obj):
         user_resq = self._get_user_request()
         if user_resq and user_resq.is_authenticated:
-            group_user = obj.group_members.filter(user=user_resq).first()
+            cache_key = self._my_info_cache_key(user_resq, obj)
+            group_user = cache.get(cache_key)
+            if not group_user:
+                group_user = obj.group_members.filter(user=user_resq).first()
+                cache.set(cache_key, group_user, 60 * 1)
             if group_user:
                 return GroupUserSerializer(group_user, omit=["group"]).data
+
+    def _my_info_cache_key(self, user: User, group: Group):
+        return '_'.join([user.cache_key, group.cache_key, 'myinfo'])
 
 
 class GroupUserSerializer(FlexFieldsModelSerializer):
@@ -335,12 +351,19 @@ class PostSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
                 'data': CompanySerializer(obj.via_object, fields=['id', 'name', 'slug', ]).data
             }
 
-    def get_my_view(self, obj):
+    def get_my_view(self, obj: Post):
         user_resq = self._get_user_request()
         if user_resq and user_resq.is_authenticated:
-            viewed = obj.views.filter(create_by=user_resq).first()
+            cache_key = self._my_view_cache_key(user_resq, obj)
+            viewed = cache.get(cache_key)
+            if not viewed:
+                viewed = obj.views.filter(create_by=user_resq).first()
+                cache.set(cache_key, viewed, 60 * 1)
             if viewed:
                 return ViewSerializer(viewed, omit=["post", "create_by"]).data
+
+    def _my_view_cache_key(self, user: User, post: Post):
+        return '_'.join([user.cache_key, post.cache_key, 'myview'])
 
     def _get_user_request(self):
         request = self.context.get('request', None)
@@ -385,11 +408,19 @@ class UserNotificationSerializer(FlexFieldsModelSerializer):
             'user': (UserSerializer, {'many': False})
         }
 
-    def get_payload(self, obj):
-        return obj.get_payload()
+    def get_payload(self, obj: UserNotification):
+        cache_key = self._payload_cache_key(instance=obj)
+        payload = cache.get(cache_key)
+        if not payload:
+            payload = obj.get_payload()
+            cache.set(cache_key, payload, 60 * 1)
+        return payload
 
     def get_timestamp(self, obj):
         return obj.notification.create_at
+
+    def _payload_cache_key(self, instance: UserNotification):
+        return '_'.join([instance.user.cache_key, instance.cache_key, 'payload'])
 
 
 class DeviceSerializer(FlexFieldsModelSerializer):

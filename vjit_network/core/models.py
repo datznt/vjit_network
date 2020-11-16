@@ -11,6 +11,7 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator, FileExtensionValidator
 from django.core.files.storage import FileSystemStorage
+from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.forms import ValidationError
 from django.contrib.sites.models import Site
@@ -22,7 +23,7 @@ from safedelete.models import SOFT_DELETE
 from ckeditor.fields import RichTextField
 
 from vjit_network.core import manager, customfields, utils
-from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel, IsActiveModel
+from vjit_network.common.models import BigIntPrimary, UUIDPrimaryModel, PerfectModel, CreateAtModel, IsActiveModel, CacheKeyModel
 from vjit_network.common.validators import FileMaxSizeValidator
 
 import json
@@ -36,6 +37,7 @@ OTP_CODE_FROM = settings.OTP_CODE_FROM
 OTP_CODE_TO = settings.OTP_CODE_TO
 FILE_ALLOWED_EXTENTIONS = settings.FILE_ALLOWED_EXTENTIONS
 FILE_MAX_SIZE = settings.FILE_MAX_SIZE
+
 
 class EmploymentTypeChoices(models.TextChoices):
     FULL_TIME = 'full_time', _('Full-time')
@@ -57,7 +59,7 @@ class Tag(PerfectModel):
         verbose_name_plural = _('Tags')
 
 
-class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
+class File(UUIDPrimaryModel, CreateAtModel, PerfectModel, CacheKeyModel):
     def directory_path(self):
         """
         0:  user id
@@ -116,7 +118,9 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
         verbose_name_plural = _('Files')
 
     def has_thumbnail(self):
-        return hasattr(self, 'thumbnails') and self.thumbnails is not None and len(self.thumbnails['thumbs']) > 0
+        return all([hasattr(self, 'thumbnails'),
+                    self.thumbnails is not None,
+                    len(self.thumbnails['thumbs']) > 0])
 
     def reverse_thumbnails(self):
         if not self.has_thumbnail():
@@ -131,16 +135,21 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel):
 
     @property
     def lazy_thumbnail_url(self):
-        thumbnails = self.reverse_thumbnails()
+        cache_key = self._lazy_cache_key()
+        thumbnails = cache.get(cache_key)
         if not thumbnails:
-            return None
-        return thumbnails[-1]
+            thumbnails = self.reverse_thumbnails()
+            cache.set(cache_key, thumbnails, 60 * 1)
+        return thumbnails[-1] if thumbnails else None
+
+    def _lazy_cache_key(self):
+        return self.cache_key + '_lazy'
 
     def __str__(self):
         return self.name
 
 
-class User(BigIntPrimary, AbstractUser, PerfectModel):
+class User(BigIntPrimary, AbstractUser, PerfectModel, CacheKeyModel):
     MALE = "male"
     FEMALE = "female"
     UNKNOWN = 'unknown'
@@ -153,7 +162,7 @@ class User(BigIntPrimary, AbstractUser, PerfectModel):
         verbose_name=_('Full name'),
         null=True,
         blank=True,
-        max_length = 131
+        max_length=131
     )
     avatar = models.OneToOneField(
         verbose_name=_('Avatar'),
@@ -573,7 +582,7 @@ class GroupUser(BigIntPrimary, IsActiveModel, PerfectModel):
         verbose_name_plural = _('Join the groups')
 
 
-class Group(BigIntPrimary, CreateAtModel, PerfectModel):
+class Group(BigIntPrimary, CreateAtModel, PerfectModel, CacheKeyModel):
     create_by = models.ForeignKey(
         verbose_name=_('Group'),
         to=User,
@@ -650,7 +659,7 @@ class Group(BigIntPrimary, CreateAtModel, PerfectModel):
         return self.name
 
 
-class View(BigIntPrimary, CreateAtModel, PerfectModel):
+class View(BigIntPrimary, CreateAtModel, PerfectModel, CacheKeyModel):
     create_by = models.ForeignKey(
         verbose_name=_('User'),
         to=User,
@@ -858,7 +867,7 @@ class Company(O2OUser, CreateAtModel, PerfectModel):
         )
 
 
-class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
+class Post(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel, CacheKeyModel):
 
     _safedelete_policy = SOFT_DELETE
 
@@ -1050,6 +1059,7 @@ class AttachPost(BigIntPrimary, SafeDeleteModel, PerfectModel):
 
     def __str__(self):
         return str(self.pk)
+
 
 class Contact(BigIntPrimary, CreateAtModel, PerfectModel):
     name = models.CharField(

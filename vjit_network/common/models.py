@@ -56,3 +56,12 @@ class IsActiveModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class CacheKeyModel(models.Model):
+    class Meta:
+        abstract = True
+    
+    @property
+    def cache_key(self):
+        return f'obj_{self._meta.model_name}_{self.pk}'

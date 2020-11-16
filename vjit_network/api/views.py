@@ -58,7 +58,7 @@ class UserViewSet(
     filterset_class = filtersets.UserFilter
     search_fields = ('username', 'last_name', 'email')
     queryset = User.objects.all()
-    permission_classes = (permissions.UserPermission,)
+    permission_classes = (IsAuthenticated & permissions.UserPermission,)
     serializer_classes = {
         ('list', 'retrieve', 'partial_update', 'update'): serializers.UserSerializer,
         ('session_user',): serializers.SessionUserSerializer,
@@ -199,7 +199,7 @@ class UserSettingViewSet(
     lookup_field = 'id'
     queryset = UserSetting.objects.all()
     serializer_class = serializers.UserSettingSerializer
-    permission_classes = (permissions.UserSettingPermission,)
+    permission_classes = (IsAuthenticated & permissions.UserSettingPermission,)
 
 
 class GroupViewSet(
@@ -219,7 +219,7 @@ class GroupViewSet(
         ('posts',): serializers.PostSerializer,
         ('files',): serializers.FileSerializer
     }
-    permission_classes = (permissions.GroupPermission,)
+    permission_classes = (IsAuthenticated & permissions.GroupPermission,)
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = filtersets.GroupFilter
     search_fields = ('name', 'slug',)
@@ -267,7 +267,7 @@ class GroupUserViewSet(mixins.RetrieveModelMixin,
     ordering = ['-user__username']
     lookup_field = 'id'
     serializer_class = serializers.GroupUserSerializer
-    permission_classes = (permissions.GroupUserPermission,)
+    permission_classes = (IsAuthenticated & permissions.GroupUserPermission,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.GroupMemberFilter
@@ -284,7 +284,7 @@ class FileViewSet(mixins.RetrieveModelMixin,
     """
     ordering = ['-create_at']
     serializer_class = serializers.FileSerializer
-    permission_classes = (permissions.IsMyObjectPermission,)
+    permission_classes = (IsAuthenticated & permissions.FilePermission,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.FileFilterSet
@@ -292,7 +292,8 @@ class FileViewSet(mixins.RetrieveModelMixin,
     queryset = File.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(create_by=self.request.user)
+        serializer.validated_data['create_by'] = self.request.user
+        return super(FileViewSet, self).perform_create(serializer)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -312,16 +313,20 @@ class PostViewSet(mixins.RetrieveModelMixin,
     serializer_class = serializers.PostSerializer
     queryset = (Post.objects.select_related('create_by', 'via_type',).prefetch_related(
         'attaches', 'views', 'comments', 'via_object', 'approvals'))
-    permission_classes = (permissions.PostPermission,)
+    permission_classes = (IsAuthenticated & permissions.PostPermission,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.PostFilter
     search_fields = ('content', 'create_by__username', 'create_by__full_name',)
 
+    def perform_create(self, serializer):
+        serializer.validated_data['create_by'] = self.request.user
+        return super(PostViewSet, self).perform_create(serializer)
+
 
 class ViewViewSet(mixins.RetrieveModelMixin,
-                  mixins.ListModelMixin, mixins.UpdateModelMixin,
-                  mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -329,7 +334,7 @@ class ViewViewSet(mixins.RetrieveModelMixin,
     ordering = ['-create_at']
     queryset = (View.objects.select_related('create_by', 'post'))
     serializer_class = serializers.ViewSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.ViewFilterSet
@@ -343,7 +348,11 @@ class ViewViewSet(mixins.RetrieveModelMixin,
             self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
-    @method_decorator(cache_page(60 * 5))
+    def perform_create(self, serializer):
+        serializer.validated_data['create_by'] = self.request.user
+        return super(ViewViewSet, self).perform_create(serializer)
+
+    @method_decorator(cache_page(60 * 1))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -359,7 +368,7 @@ class CommentViewSet(mixins.RetrieveModelMixin,
     queryset = (Comment.objects.select_related('create_by', 'parent',
                                                'content_type').prefetch_related('content_object'))
     serializer_class = serializers.CommentSerializer
-    permission_classes = (permissions.IsMyObjectPermission,)
+    permission_classes = (IsAuthenticated & permissions.CommentPermission,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     filterset_class = filtersets.CommentFilter
@@ -381,6 +390,7 @@ class CommentViewSet(mixins.RetrieveModelMixin,
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+
 class StudentViewSet(
         mixins.ListModelMixin, mixins.UpdateModelMixin,
         mixins.RetrieveModelMixin,
@@ -388,8 +398,12 @@ class StudentViewSet(
     ordering = ['-user']
     lookup_field = 'user'
     queryset = Student.objects.all()
-    permission_classes = (permissions.StudentPermission,)
+    permission_classes = (IsAuthenticated & permissions.StudentPermission,)
     serializer_class = serializers.StudentSerializer
+
+    def perform_create(self, serializer):
+        serializer.validated_data['user'] = self.request.user
+        return super(StudentViewSet, self).perform_create(serializer)
 
 
 class CompanyViewSet(mixins.RetrieveModelMixin,
@@ -404,7 +418,7 @@ class CompanyViewSet(mixins.RetrieveModelMixin,
     serializer_class = serializers.CompanySerializer
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
-    permission_classes = (permissions.CompanyPermission,)
+    permission_classes = (IsAuthenticated & permissions.CompanyPermission,)
     search_fields = ('name',)
 
     @action(methods=['GET'], detail=True, url_path='files', permission_classes=[AllowAny])
@@ -419,6 +433,10 @@ class CompanyViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        serializer.validated_data['user'] = self.request.user
+        return super(CompanyViewSet, self).perform_create(serializer)
+
 
 class TagViewSet(
         mixins.CreateModelMixin, mixins.RetrieveModelMixin,
@@ -429,7 +447,7 @@ class TagViewSet(
     lookup_field = 'id'
     queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
 
 class SkillViewSet(mixins.RetrieveModelMixin,
@@ -442,10 +460,14 @@ class SkillViewSet(mixins.RetrieveModelMixin,
     lookup_field = 'id'
     queryset = Skill.objects.all()
     serializer_class = serializers.SkillSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     filter_backends = (filters.DjangoFilterBackend,
                        SearchFilter, OrderingFilter)
     search_fields = ('name', 'id',)
+
+    def perform_create(self, serializer):
+        serializer.validated_data['create_by'] = self.request.user
+        return super(SkillViewSet, self).perform_create(serializer)
 
 
 class IndustryViewSet(mixins.RetrieveModelMixin,
@@ -458,12 +480,12 @@ class IndustryViewSet(mixins.RetrieveModelMixin,
     lookup_field = 'id'
     queryset = Industry.objects.all()
     serializer_class = serializers.IndustrySerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
 
 class UserNotificationViewSet(mixins.RetrieveModelMixin,
                               mixins.ListModelMixin, mixins.UpdateModelMixin,
-                              mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                              mixins.DestroyModelMixin,
                               viewsets.GenericViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -483,9 +505,6 @@ class UserNotificationViewSet(mixins.RetrieveModelMixin,
             return qs
         return qs.filter(user=self.request.user)
 
-    @method_decorator(cache_page(60 * 1))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
 class UserDeviceViewSet(mixins.RetrieveModelMixin,
                         mixins.ListModelMixin, mixins.UpdateModelMixin,
@@ -509,6 +528,10 @@ class UserDeviceViewSet(mixins.RetrieveModelMixin,
             return qs
         return qs.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.validated_data['user'] = self.request.user
+        return super(UserDeviceViewSet, self).perform_create(serializer)
+
 
 class LinkViewSet(mixins.RetrieveModelMixin,
                   mixins.ListModelMixin, mixins.UpdateModelMixin,
@@ -525,7 +548,8 @@ class LinkViewSet(mixins.RetrieveModelMixin,
     permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
-        serializer.save(create_by=self.request.user)
+        serializer.validated_data['create_by'] = self.request.user
+        return super(LinkViewSet, self).perform_create(serializer)
 
 
 class ContactViewSet(mixins.RetrieveModelMixin,
