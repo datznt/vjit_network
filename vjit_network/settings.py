@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'debug_toolbar',
     'import_export',
+    'dbbackup',  # django-dbbackup
 
     'vjit_network.common',
     'vjit_network.core',
@@ -231,7 +232,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'D:\logging\hutechsns.log',
+            'filename':  os.path.join('D://', 'logging', 'hutechsns.log'),
             'maxBytes': 1024 * 1024 * 1000,  # 1 GB,
             'backupCount': 3,
             'formatter': 'verbose',
@@ -255,6 +256,9 @@ EMAIL_HOST_PASSWORD = 'dat2741998'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# list of all the people who get code error notifications.
+ADMINS = [('ntz.dat', 'nguyendat.2741998@gmail.com'),]
+
 # CORS
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 CORS_ORIGIN_WHITELIST = (
@@ -270,7 +274,7 @@ INTERNAL_IPS = [
 
 # File
 THUMBNAIL_DIMENTIONS = [(100, 100), (780, 780), (1024, 1024)]
-FILE_MAX_SIZE = 15728640 # 10MB
+FILE_MAX_SIZE = 15728640  # 10MB
 FILE_ALLOWED_EXTENTIONS = [
     # documents
     'doc', 'docx', 'ppt', 'pptx', 'pdf',
@@ -299,3 +303,12 @@ OTP_EXPRIE_UNIT = 10
 # phone format
 PHONENUMBER_DB_FORMAT = 'NATIONAL'
 PHONENUMBER_DEFAULT_REGION = 'VN'
+
+# django-dbbackup
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join('D://', 'backup')}
+# When issueing dbbackup and mediabackup with --clean option, the number of old backup files are looked for and removed.
+DBBACKUP_CLEANUP_KEEP = 2
+DBBACKUP_CLEANUP_KEEP_MEDIA = 2
+# A list of all the people who get code error notifications.
+DBBACKUP_ADMINS = 'django.conf.settings.ADMINS'
