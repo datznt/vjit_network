@@ -100,7 +100,6 @@ class StudentCreateView(View):
             if not user_form.is_valid():
                 raise ValidationError(user_form.errors)
             user_instance: User = user_form.save()
-            user_instance.set_password(user_instance.password)
             user_instance.update_fields(is_student=True)
 
             student_form = StudentCreationForm({
