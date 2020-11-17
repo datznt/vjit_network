@@ -1014,13 +1014,7 @@ class Approval(BigIntPrimary, SafeDeleteModel, CreateAtModel, PerfectModel):
         self.post.save()
 
     def __str__(self):
-        if self.admin_accept and self.user_accept:
-            return _('Consensus opinion.')
-        elif not self.admin_accept and self.user_accept:
-            return _('Awaiting Approval.')
-        elif (not self.admin_accept and not self.user_accept) or (self.admin_accept and not self.user_accept):
-            return _('Dissent.')
-        return _('Awaiting Approval.')
+        return self.post.public_code
 
 
 class AttachPost(BigIntPrimary, SafeDeleteModel, PerfectModel):
