@@ -80,4 +80,4 @@ class PostPermission(BasePermission):
         req_user: models.User = request.user
         if request.method in SAFE_METHODS:
             return True
-        return any([req_user.is_staff, req_user == obj.user])
+        return any([req_user.is_staff, req_user == obj.create_by])
