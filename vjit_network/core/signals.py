@@ -10,6 +10,9 @@ from vjit_network.api.utils import extraction_link
 import mimetypes
 import os
 import shutil
+import logging
+
+logger = logging.getLogger(__name__)
 
 THUMBNAIL_DIMENTIONS = settings.THUMBNAIL_DIMENTIONS
 
@@ -47,8 +50,8 @@ def file_on_post_detete(sender, instance, **kwargs):
             instance.raw.file.close()
             del storage
             shutil.rmtree(path_need_delete_os)
-    except:
-        pass
+    except Exception as sysexcept:
+        logger.exception(sysexcept)
         # storage.delete(path_need_delete_os)
 
 

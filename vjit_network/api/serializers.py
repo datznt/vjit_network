@@ -350,6 +350,11 @@ class PostSerializer(FlexFieldsModelSerializer, WritableNestedModelSerializer):
                 'type': 'company',
                 'data': CompanySerializer(obj.via_object, fields=['id', 'name', 'slug', ]).data
             }
+        elif isinstance(obj.via_object, User):
+            return {
+                'type': 'staff',
+                'data': UserSerializer(obj.via_object, fields=['id', 'full_name', 'slug', ]).data
+            }
 
     def get_my_view(self, obj: Post):
         user_resq = self._get_user_request()
