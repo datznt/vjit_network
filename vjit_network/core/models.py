@@ -204,7 +204,7 @@ class User(BigIntPrimary, AbstractUser, PerfectModel, CacheKeyModel):
         verbose_name_plural = _('Users')
 
     def get_fullname(self):
-        full_name = ' '.join([self.last_name, self.first_name])
+        full_name = ' '.join([self.first_name, self.last_name])
         full_name = full_name.strip()
         return full_name if full_name != '' else '@'+self.username
 
