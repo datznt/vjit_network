@@ -225,6 +225,10 @@ class GroupViewSet(
     search_fields = ('name', 'slug',)
     queryset = Group.objects.all()
 
+    def get_queryset(self,):
+        qs = super(GroupViewSet, self).get_queryset()
+        return qs.filter(group_members__user=self.request.user)
+
     @action(methods=['GET'], detail=True, url_path='posts', permission_classes=[IsAuthenticated, ])
     @method_decorator(cache_page(60 * 1))
     def posts(self, request, slug=None):
