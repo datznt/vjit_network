@@ -23,9 +23,10 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
+from django.core.cache import cache
 from rest_framework.pagination import PageNumberPagination
 
-from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode, VisitLogger
+from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode, VisitLogger, get_type
 from vjit_network.api.models import NotificationTemplate, NotificationTemplateLocalization, Notification, UserNotification, Device
 from vjit_network.api.bussines import otp_code_for_user
 from vjit_network.common.mixins import LoggingViewSetMixin
@@ -42,6 +43,25 @@ MAIL_SENDER = settings.EMAIL_HOST_USER
 
 FULL_METHODS_VIEWSET = ('list', 'create', 'retrieve',
                         'update',  'partial_update', 'destroy')
+
+
+def user_feed_cache_key(user: User, cache_key: str):
+    return '_'.join([user.cache_key, 'feed', cache_key])
+
+
+def user_feed_queryset_cache(user: User):
+    cache_key = user_feed_cache_key(user, 'news')
+    qs = cache.get(cache_key)
+    if not qs:
+        groups_user_is_member = user.group_members.all().values_list('group', flat=True)
+        blockers = BlockUser.objects.as_user(user, to_list_user=True)
+        qs = Post.objects.select_related('create_by', 'via_type',).prefetch_related(
+            'attaches', 'views', 'comments', 'via_object').filter(
+                group__in=groups_user_is_member,
+                public_code=Post.PublicCode.ACCEPT
+        ).exclude(create_by__in=blockers).order_by("-create_at")
+        cache.set(cache_key, qs, 60 * 1)
+    return qs
 
 
 class UserViewSet(
@@ -76,17 +96,12 @@ class UserViewSet(
         return Response(data=serializer_data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False, url_path='news-feed', url_name='news_feed', permission_classes=[IsAuthenticated, ])
-    @method_decorator(cache_page(60 * 1))
-    @method_decorator(vary_on_headers('Authorization'))
+    # @method_decorator(cache_page(60 * 1))
+    # @method_decorator(vary_on_headers('Authorization'))
     def news_feed(self, request):
         user_req = request.user
-        groups_user_is_member = user_req.group_members.all().values_list('group', flat=True)
-        blockers = BlockUser.objects.as_user(user_req, to_list_user=True)
-        qs = Post.objects.select_related('create_by', 'via_type',).prefetch_related(
-            'attaches', 'views', 'comments', 'via_object').filter(
-                group__in=groups_user_is_member,
-                public_code=Post.PublicCode.ACCEPT
-        ).exclude(create_by__in=blockers).order_by("-create_at")
+        qs = user_feed_queryset_cache(user_req)
+
         page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -104,6 +119,14 @@ class UserViewSet(
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
+
+    # def news_stories(self, request):
+    #     user_req = request.user
+    #     feed = user_feed_queryset_cache(user_req)
+    #     attaches = AttachPost.objects.filter(
+    #         post__in=feed, content_type=get_type(File))
+    #     File.objects.filter(pk__in=list(
+    #         attaches.values_list('object_id', flat=True)))
 
 
 class AuthViewSet(MethodSerializerView, viewsets.GenericViewSet):

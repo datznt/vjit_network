@@ -111,7 +111,10 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel, CacheKeyModel):
         verbose_name=_('Thumbnails'), encoder=json.JSONEncoder, null=True, blank=True,
         # help_text=_('Field extension of the model')
     )
-    attach_posts = GenericRelation(to='AttachPost')
+    attach_posts = GenericRelation(
+        to='AttachPost', 
+        related_query_name='files'
+    )
 
     class Meta:
         verbose_name = _('File')
@@ -315,6 +318,10 @@ class Link(BigIntPrimary, CreateAtModel, PerfectModel):
         max_length=500,
         null=True,
         blank=True
+    )
+    attach_posts = GenericRelation(
+        to='AttachPost', 
+        related_query_name='links'
     )
 
     def __str__(self):
