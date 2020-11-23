@@ -22,6 +22,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from rest_framework.pagination import PageNumberPagination
 
 from vjit_network.core.models import User, Site, Industry, Skill, UserSetting, Education, Experience, Student, File, Tag, BlockUser, Link, Group, GroupUser, Comment, Approval, AttachPost, Company, View, Post, Contact, VerificationCode, VisitLogger
@@ -76,6 +77,7 @@ class UserViewSet(
 
     @action(methods=['GET'], detail=False, url_path='news-feed', url_name='news_feed', permission_classes=[IsAuthenticated, ])
     @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers('Authorization'))
     def news_feed(self, request):
         user_req = request.user
         groups_user_is_member = user_req.group_members.all().values_list('group', flat=True)
@@ -180,7 +182,7 @@ class AuthViewSet(MethodSerializerView, viewsets.GenericViewSet):
         data = serializers.ForgotTokenSerializer(token).data
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, url_path='password-reset/renew', url_name='password_reset_renew', permission_classes=[IsAuthenticated, ])
+    @action(methods=['POST'], detail=False, url_path='password-reset/renew', permission_classes=[IsAuthenticated, ])
     def password_reset_renew(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -230,11 +232,13 @@ class GroupViewSet(
         return qs.filter(group_members__user=self.request.user).distinct()
 
     @method_decorator(cache_page(60 * 60))
+    @method_decorator(vary_on_headers('Authorization'))
     def list(self, request, *args, **kwargs):
         return super(GroupViewSet, self).list(request, *args, **kwargs)
 
     @action(methods=['GET'], detail=True, url_path='posts', permission_classes=[IsAuthenticated, ])
     @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers('Authorization'))
     def posts(self, request, slug=None):
         # user_req = request.user
         instance = self.get_object()
@@ -250,6 +254,7 @@ class GroupViewSet(
 
     @action(methods=['GET'], detail=True, url_path='files', permission_classes=[IsAuthenticated, ])
     @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers('Authorization'))
     def files(self, request, slug=None):
         instance = self.get_object()
         qs = instance.get_files()
@@ -361,6 +366,7 @@ class ViewViewSet(mixins.RetrieveModelMixin,
         return super(ViewViewSet, self).perform_create(serializer)
 
     @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers('Authorization'))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -395,6 +401,7 @@ class CommentViewSet(mixins.RetrieveModelMixin,
         qs.exclude(create_by__in=blockers)
 
     @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers('Authorization'))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -511,7 +518,7 @@ class UserNotificationViewSet(mixins.RetrieveModelMixin,
         qs = super().get_queryset()
         if not self.request:
             return qs
-        return qs.filter(user=self.request.user)
+        return qs.filter(user=self.request.user, notification__is_publish=True)
 
 
 class UserDeviceViewSet(mixins.RetrieveModelMixin,
