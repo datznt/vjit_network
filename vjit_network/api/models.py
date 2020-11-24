@@ -73,8 +73,8 @@ class NotificationTemplateLocalization(PerfectModel):
     notification_template = models.ForeignKey(
         NotificationTemplate, on_delete=models.CASCADE, related_name='localizations')
     language = models.CharField(
-        verbose_name=_('Language'), 
-        max_length=2, 
+        verbose_name=_('Language'),
+        max_length=2,
         default='vi', choices=settings.LANGUAGES,
     )
     title_html = RichTextField(verbose_name=_(
@@ -113,17 +113,15 @@ class UserNotification(UUIDPrimaryModel, PerfectModel, CacheKeyModel):
             sites_api_domain = Site.objects._get_site_by_id(site_id=1)
             sites_web_domain = Site.objects._get_site_by_id(site_id=2)
             sites_app_domain = Site.objects._get_site_by_id(site_id=3)
-            context = Context(
-                {
-                    'sites': {
-                        'api': sites_api_domain.domain,
-                        'web': sites_web_domain.domain,
-                        'app': sites_app_domain.domain
-                    },
-                    'actor': self.notification.actor,
-                    'payload': self.notification.payload
-                }
-            )
+            context = Context({
+                'sites': {
+                    'api': sites_api_domain.domain,
+                    'web': sites_web_domain.domain,
+                    'app': sites_app_domain.domain
+                },
+                'actor': self.notification.actor,
+                'payload': self.notification.payload
+            })
             # render title notification
             template = Template(notification_localization.title_plantext)
             payload['title'] = template.render(context)
@@ -153,6 +151,7 @@ class UserNotification(UUIDPrimaryModel, PerfectModel, CacheKeyModel):
 
     def _payload_cache_key(self,):
         return '_'.join([self.user.cache_key, self.cache_key, 'payload'])
+
 
 class Notification(UUIDPrimaryModel, PerfectModel):
     actor = models.ForeignKey(

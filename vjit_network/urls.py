@@ -23,7 +23,7 @@ from django.contrib.staticfiles.urls import static
 
 urlpatterns = [
     # backend
-    url('admin/', admin.site.urls),
+    url('', admin.site.urls),
     url('', include('vjit_network.core.urls')),
     url('grappelli/', include('grappelli.urls')),
     url('api/', include('vjit_network.api.urls', namespace='vjit_network.api')),
