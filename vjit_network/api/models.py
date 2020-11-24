@@ -101,7 +101,7 @@ class UserNotification(UUIDPrimaryModel, PerfectModel, CacheKeyModel):
 
     def get_payload(self):
         cache_key = self._payload_cache_key()
-        payload = cache.get(cache_key)
+        payload = cache.get(cache_key, {})
         if not payload:
             notify_template = self.notification.template
             user_lang_code = UserSetting.objects.get(
