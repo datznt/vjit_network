@@ -95,7 +95,7 @@ class UserViewSet(
         serializer_data = {'user': user_data}
         return Response(data=serializer_data, status=status.HTTP_200_OK)
 
-    @action(methods=['GET'], detail=False, url_path='news-feed', url_name='news_feed', permission_classes=[IsAuthenticated, ])
+    @action(methods=['GET'], detail=False, url_path='news-feed', permission_classes=[IsAuthenticated, ])
     # @method_decorator(cache_page(60 * 1))
     # @method_decorator(vary_on_headers('Authorization'))
     def news_feed(self, request):
@@ -176,7 +176,7 @@ class AuthViewSet(MethodSerializerView, viewsets.GenericViewSet):
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=False, url_path='password-reset', url_name='password_reset', )
+    @action(methods=['POST'], detail=False, url_path='password-reset', )
     def password_reset(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -196,7 +196,7 @@ class AuthViewSet(MethodSerializerView, viewsets.GenericViewSet):
             'user': new_otp.user.pk
         }, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, url_path='password-reset/verify', url_name='password_reset_verify')
+    @action(methods=['POST'], detail=False, url_path='password-reset/verify', )
     def password_reset_verify(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -380,8 +380,7 @@ class ViewViewSet(mixins.RetrieveModelMixin,
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(
-            self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
     def perform_create(self, serializer):
@@ -419,8 +418,7 @@ class CommentViewSet(mixins.RetrieveModelMixin,
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(
-            self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
     @method_decorator(cache_page(60 * 1))

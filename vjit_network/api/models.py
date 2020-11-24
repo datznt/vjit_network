@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.postgres.fields import JSONField
 from django.template import Template, Context
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from vjit_network.core.models import UserSetting
 from vjit_network.common.models import UUIDPrimaryModel, PerfectModel, CacheKeyModel
 from ckeditor.fields import RichTextField
@@ -99,54 +100,59 @@ class UserNotification(UUIDPrimaryModel, PerfectModel, CacheKeyModel):
     is_read = models.BooleanField(default=False)
 
     def get_payload(self):
-        data = {}
-        notify_template = self.notification.template
-        user_lang_code = UserSetting.objects.get(
-            user=self.user).language
-        notification_localization = notify_template.localizations.filter(
-            language=user_lang_code).first()
-        if not notification_localization:
-            notification_localization = notify_template.localizations.first()
-        sites_api_domain = Site.objects._get_site_by_id(site_id=1)
-        sites_web_domain = Site.objects._get_site_by_id(site_id=2)
-        sites_app_domain = Site.objects._get_site_by_id(site_id=3)
-        context = Context(
-            {
-                'sites': {
-                    'api': sites_api_domain.domain,
-                    'web': sites_web_domain.domain,
-                    'app': sites_app_domain.domain
-                },
-                'actor': self.notification.actor,
-                'payload': self.notification.payload
-            }
-        )
-        # render title notification
-        template = Template(notification_localization.title_plantext)
-        data['title'] = template.render(context)
-        # render title notification - html
-        template = Template(notification_localization.title_html)
-        data['title_html'] = template.render(context)
-        # render content notification
-        template = Template(notification_localization.content_plantext)
-        data['content'] = template.render(context)
-        # render content notification - html
-        template = Template(notification_localization.content_html)
-        data['content_html'] = template.render(context)
-        # render icon notification
-        template = Template(notify_template.icon_field_name)
-        data['icon'] = template.render(context)
-        # render image notification
-        template = Template(notify_template.image_field_name)
-        data['image'] = template.render(context)
-        # render launch url notification
-        template = Template(notify_template.launch_url_format)
-        data['launch_url'] = template.render(context)
-        # render app url notification
-        template = Template(notify_template.app_url_format)
-        data['app_url'] = template.render(context)
-        return data
+        cache_key = self._payload_cache_key()
+        payload = cache.get(cache_key)
+        if not payload:
+            notify_template = self.notification.template
+            user_lang_code = UserSetting.objects.get(
+                user=self.user).language
+            notification_localization = notify_template.localizations.filter(
+                language=user_lang_code).first()
+            if not notification_localization:
+                notification_localization = notify_template.localizations.first()
+            sites_api_domain = Site.objects._get_site_by_id(site_id=1)
+            sites_web_domain = Site.objects._get_site_by_id(site_id=2)
+            sites_app_domain = Site.objects._get_site_by_id(site_id=3)
+            context = Context(
+                {
+                    'sites': {
+                        'api': sites_api_domain.domain,
+                        'web': sites_web_domain.domain,
+                        'app': sites_app_domain.domain
+                    },
+                    'actor': self.notification.actor,
+                    'payload': self.notification.payload
+                }
+            )
+            # render title notification
+            template = Template(notification_localization.title_plantext)
+            payload['title'] = template.render(context)
+            # render title notification - html
+            template = Template(notification_localization.title_html)
+            payload['title_html'] = template.render(context)
+            # render content notification
+            template = Template(notification_localization.content_plantext)
+            payload['content'] = template.render(context)
+            # render content notification - html
+            template = Template(notification_localization.content_html)
+            payload['content_html'] = template.render(context)
+            # render icon notification
+            template = Template(notify_template.icon_field_name)
+            payload['icon'] = template.render(context)
+            # render image notification
+            template = Template(notify_template.image_field_name)
+            payload['image'] = template.render(context)
+            # render launch url notification
+            template = Template(notify_template.launch_url_format)
+            payload['launch_url'] = template.render(context)
+            # render app url notification
+            template = Template(notify_template.app_url_format)
+            payload['app_url'] = template.render(context)
+            cache.set(cache_key, payload, 60 * 1)
+        return payload
 
+    def _payload_cache_key(self,):
+        return '_'.join([self.user.cache_key, self.cache_key, 'payload'])
 
 class Notification(UUIDPrimaryModel, PerfectModel):
     actor = models.ForeignKey(

@@ -414,18 +414,11 @@ class UserNotificationSerializer(FlexFieldsModelSerializer):
         }
 
     def get_payload(self, obj: UserNotification):
-        cache_key = self._payload_cache_key(instance=obj)
-        payload = cache.get(cache_key)
-        if not payload:
-            payload = obj.get_payload()
-            cache.set(cache_key, payload, 60 * 1)
+        payload = obj.get_payload()
         return payload
 
     def get_timestamp(self, obj):
         return obj.notification.create_at
-
-    def _payload_cache_key(self, instance: UserNotification):
-        return '_'.join([instance.user.cache_key, instance.cache_key, 'payload'])
 
 
 class DeviceSerializer(FlexFieldsModelSerializer):
