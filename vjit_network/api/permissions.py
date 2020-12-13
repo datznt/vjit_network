@@ -76,6 +76,11 @@ class CompanyPermission(BasePermission):
 
 class PostPermission(BasePermission):
 
+    def has_permission(self, request, view):
+        if view.action == 'list':
+            return request.user.is_staff
+        return True
+
     def has_object_permission(self, request, view, obj: models.Company):
         req_user: models.User = request.user
         if request.method in SAFE_METHODS:
