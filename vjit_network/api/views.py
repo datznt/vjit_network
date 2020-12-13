@@ -220,7 +220,8 @@ class GroupViewSet(
         ('files',): serializers.FileSerializer
     }
     permission_classes = (IsAuthenticated & permissions.GroupPermission,)
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,
+                       SearchFilter, OrderingFilter)
     filterset_class = filtersets.GroupFilter
     search_fields = ('name', 'slug',)
     queryset = Group.objects.all()
