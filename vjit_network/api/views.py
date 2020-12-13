@@ -255,10 +255,10 @@ class GroupViewSet(
         qs = super(GroupViewSet, self).get_queryset()
         return qs.filter(group_members__user=self.request.user).distinct()
 
-    @method_decorator(cache_page(60 * 60))
-    @method_decorator(vary_on_headers('Authorization'))
-    def list(self, request, *args, **kwargs):
-        return super(GroupViewSet, self).list(request, *args, **kwargs)
+    # @method_decorator(cache_page(60 * 60))
+    # @method_decorator(vary_on_headers('Authorization'))
+    # def list(self, request, *args, **kwargs):
+    #     return super(GroupViewSet, self).list(request, *args, **kwargs)
 
     @action(methods=['GET'], detail=True, url_path='posts', permission_classes=[IsAuthenticated, ])
     @method_decorator(cache_page(60 * 1))
