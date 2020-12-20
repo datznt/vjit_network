@@ -482,6 +482,8 @@ class Experience(BigIntPrimary, PerfectModel):
     headline = models.CharField(
         verbose_name=_('Headline'),
         max_length=255,
+        null=True,
+        blank=True
     )
     description = models.TextField(
         verbose_name=_('Description'),

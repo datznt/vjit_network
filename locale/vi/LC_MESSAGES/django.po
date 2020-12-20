@@ -449,7 +449,7 @@ msgstr "Đường dẫn liên kết"
 
 #: .\vjit_network\core\models.py:305 .\vjit_network\core\models.py:440
 msgid "Title"
-msgstr "Tiêu đề"
+msgstr "Công việc"
 
 #: .\vjit_network\core\models.py:311
 msgid "Link name"
@@ -514,7 +514,7 @@ msgstr "sv - "
 
 #: .\vjit_network\core\models.py:445
 msgid "Employment type"
-msgstr "Loại nhân viên"
+msgstr "Vị trí"
 
 #: .\vjit_network\core\models.py:453 .\vjit_network\core\models.py:862
 msgid "Company"
@@ -526,7 +526,7 @@ msgstr "Công ty(phát hiện dựa vào tên)"
 
 #: .\vjit_network\core\models.py:465
 msgid "Location"
-msgstr "Vị trí"
+msgstr "Địa điểm(Tỉnh/Thành)"
 
 #: .\vjit_network\core\models.py:471
 msgid "I am currently working in this role"
@@ -542,7 +542,7 @@ msgstr "Ngày kết thúc"
 
 #: .\vjit_network\core\models.py:483
 msgid "Headline"
-msgstr "Tiêu đề"
+msgstr "Thành tích"
 
 #: .\vjit_network\core\models.py:495
 msgid "Experience"
@@ -655,7 +655,7 @@ msgstr ""
 #: .\vjit_network\core\models.py:723 .\vjit_network\core\models.py:911
 #: .\vjit_network\core\models.py:1077
 msgid "Content"
-msgstr "Nội dung"
+msgstr "Nội dung trao đổi"
 
 #: .\vjit_network\core\models.py:724
 msgid "Content of the comment"
