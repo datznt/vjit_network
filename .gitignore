@@ -87,6 +87,7 @@ target/
 __pycache__/
 local_settings.py
 mediafiles/
+static/
 .env
 db.sqlite3
 

@@ -161,7 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join('D://', 'mediafiles')
@@ -312,3 +312,6 @@ DBBACKUP_CLEANUP_KEEP = 2
 DBBACKUP_CLEANUP_KEEP_MEDIA = 2
 # A list of all the people who get code error notifications.
 DBBACKUP_ADMINS = 'django.conf.settings.ADMINS'
+
+# ADMIN SYSTEM USER ID
+ADMIN_SYSTEM_USER_ID = 1

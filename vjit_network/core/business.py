@@ -143,7 +143,7 @@ def lookup_groups_from_class_id(defaults: List[str], class_id: str):
                 start_year,      #15
                 class_id         #15DCKJ01
             ])
-    list_slugs = list(map(lambda    x: slugify(x), list_slugs))
+    list_slugs = list(map(lambda x: slugify(x), list_slugs))
     return Group.objects.filter(slug__in=list_slugs)
 
 

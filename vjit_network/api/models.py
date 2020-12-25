@@ -60,6 +60,7 @@ class NotificationTemplate(PerfectModel):
     sound = models.CharField(
         max_length=50, verbose_name=_('sound'), default=None, null=True, blank=True,
         help_text=_("The sound that plays when this notification is received by the device. If no sound is specified, the device's default sound will play."))
+    is_system = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
