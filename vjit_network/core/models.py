@@ -375,6 +375,13 @@ class Student(O2OUser, PerfectModel):
         extra   -- this is extention field of the model
     """
 
+    def default_student_extra():
+        return {
+            "Others": "",
+            "argsEmail": [""],
+            "argsPhone": [""]
+        }
+
     phone = PhoneNumberField(
         verbose_name=_('Phone number'),
         null=True,
@@ -406,11 +413,7 @@ class Student(O2OUser, PerfectModel):
     extra = JSONField(
         encoder=json.JSONEncoder,
         null=True, blank=True,
-        default={
-            "Others": "",
-            "argsEmail": [""],
-            "argsPhone": [""]
-        }
+        default=default_student_extra
     )
 
     posts = GenericRelation(
