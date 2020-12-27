@@ -112,7 +112,7 @@ class File(UUIDPrimaryModel, CreateAtModel, PerfectModel, CacheKeyModel):
         # help_text=_('Field extension of the model')
     )
     attach_posts = GenericRelation(
-        to='AttachPost', 
+        to='AttachPost',
         related_query_name='files'
     )
 
@@ -320,7 +320,7 @@ class Link(BigIntPrimary, CreateAtModel, PerfectModel):
         blank=True
     )
     attach_posts = GenericRelation(
-        to='AttachPost', 
+        to='AttachPost',
         related_query_name='links'
     )
 
@@ -406,6 +406,11 @@ class Student(O2OUser, PerfectModel):
     extra = JSONField(
         encoder=json.JSONEncoder,
         null=True, blank=True,
+        default={
+            "Others": "",
+            "argsEmail": [""],
+            "argsPhone": [""]
+        }
     )
 
     posts = GenericRelation(

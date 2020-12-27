@@ -4,6 +4,7 @@ from vjit_network.core.models import Student, Education, Group, User, GroupUser
 from typing import List, TypeVar, Generic
 import pandas as pd
 
+BIRTH_DATE_FORMAT = '%d/%m/%Y'
 
 class StudentExport(object):
     _fields = ('username',
@@ -107,6 +108,9 @@ def dump_student_to_xlsx(queryset: QuerySet):
             field_of_study = education.field_of_study
             start_year = education.start_year
             end_year = education.end_year
+
+        if birth_date:
+            birth_date = birth_date.strftime(BIRTH_DATE_FORMAT)
 
         list_student.append(StudentExport(
             username=username,

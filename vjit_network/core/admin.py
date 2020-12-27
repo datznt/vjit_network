@@ -184,6 +184,7 @@ class UserAdmin(DjangoUserAdmin):
                    'is_superuser', 'is_active')
     list_per_page = 10
     date_hierarchy = 'date_joined'
+    exclude = ('is_online',)
 
     class user_setting_inline(admin.StackedInline):
         model = UserSetting
@@ -418,6 +419,7 @@ class StudentAdmin(ModelAdmin):
     class education_inlines(admin.StackedInline):
         model = Education
         extra = 1
+        exclude = ('activities', 'description',)
 
     inlines = [experience_inlines, education_inlines, ]
 

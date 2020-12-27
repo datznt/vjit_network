@@ -5,13 +5,15 @@ from django.utils.translation import gettext_lazy as _
 
 from vjit_network.core.business import StudentExport
 from vjit_network.core.models import User, Student, Education
-
+from datetime import datetime
 import pandas as pd
 import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
+BIRTH_DATE_FORMAT = '%d/%m/%Y'
 
 class UserCreationForm(forms.ModelForm):
     class Meta:
@@ -34,6 +36,7 @@ class StudentCreationForm(forms.ModelForm):
         model = Student
         fields = ['user', 'phone', 'birth_date', 'address']
     user = forms.ModelChoiceField(User.objects.all(), required=False)
+    birth_date = forms.DateField(input_formats=[BIRTH_DATE_FORMAT], required=False)
 
 
 class EducationCreationForm(forms.ModelForm):
@@ -72,11 +75,15 @@ class StudentUploadForm(forms.Form):
         }
 
     def get_student_from_row(self, row):
-        birth_date = row.get('birth_date', None)
-        if not pd.isna(birth_date) and hasattr(birth_date, 'date'):
-            birth_date = birth_date.date()
-        else:
-            birth_date = ''
+        birth_date = row.get('birth_date', '')
+        if not pd.isna(birth_date):
+            if hasattr(birth_date, 'date'):
+                birth_date = birth_date.strftime(BIRTH_DATE_FORMAT)
+            elif isinstance(birth_date, str):
+                try:
+                    datetime.strptime(birth_date, format=BIRTH_DATE_FORMAT)
+                except Exception:
+                    pass
         return {
             'phone': str(row.get('phone', ''),),
             'birth_date': birth_date,

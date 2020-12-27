@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'vjit_network.common',
     'vjit_network.core',
     'vjit_network.api',
+    'vjit_network.cmd_job',
 ]
 
 MIDDLEWARE = [
