@@ -116,7 +116,7 @@ class FileSerializer(FlexFieldsModelSerializer):
                 'location': absolute_url,
                 'nodes': instance.thumbnails['thumbs'],
             }
-            cache.set(cache_key, thumbnails, 60 * 1)
+            cache.set(cache_key, thumbnails, 60 * 60 * 3)
         return thumbnails
 
     def _thumbnails_cache_key(self, file: File):

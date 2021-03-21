@@ -356,6 +356,19 @@ class PostViewSet(mixins.RetrieveModelMixin,
     filterset_class = filtersets.PostFilter
     search_fields = ('content', 'create_by__username', 'create_by__full_name',)
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request:
+            return Post.objects.none()
+
+        # get authenticated user from request api
+        req_user : User = self.request.user
+        
+        # If the user is not an STAFF, only that person's posts will be returned
+        if not req_user.is_staff:
+            qs = qs.filter(create_by = req_user)
+        return qs
+
     def perform_create(self, serializer):
         serializer.validated_data['create_by'] = self.request.user
         return super(PostViewSet, self).perform_create(serializer)
@@ -381,7 +394,8 @@ class ViewViewSet(mixins.RetrieveModelMixin,
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(
+            self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
     def perform_create(self, serializer):
@@ -419,7 +433,8 @@ class CommentViewSet(mixins.RetrieveModelMixin,
         qs = super().get_queryset()
         if not self.request:
             return qs
-        blockers = BlockUser.objects.as_user(self.request.user, to_list_user=True)
+        blockers = BlockUser.objects.as_user(
+            self.request.user, to_list_user=True)
         qs.exclude(create_by__in=blockers)
 
     @method_decorator(cache_page(60 * 1))
