@@ -1,6 +1,7 @@
 Django==3.0
 djangorestframework==3.11.0
-psycopg2==2.8.4
+psycopg2-binary==2.9.1
+psycopg2==2.9.1
 drf-flex-fields==0.7.5                      #https://github.com/rsinger86/drf-flex-fields
 django-filter==2.0
 coreapi==2.3.3                              #https://github.com/core-api/python-client
@@ -10,7 +11,7 @@ django-ckeditor==5.9.0                      #https://django-ckeditor.readthedocs
 django-cors-headers==3.2.1
 django-storages==1.9.1                      #https://django-storages.readthedocs.io/en/latest/index.html
 Pillow==7.1.2
-opencv-python==4.1.2.30
+opencv-python==4.4.0.40
 django-debug-toolbar==2.2
 django-redis==4.11.0                        #https://github.com/jazzband/django-redis
 drf-extensions==0.6.0                       #https://github.com/chibisov/drf-extensions

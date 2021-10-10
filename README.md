@@ -38,3 +38,12 @@ mở browser nhập **[www.mysite.local:8000](http://www.mysite.local:8000/)** :
     python manage.py compilemessages -i env
     ```
  4. restart lại project.
+
+
+ ### DEV in docker enviroment
+ ## 1. deploy db
+**cmd:**\
+```
+docker-compose up db
+docker-compose run --rm db psql -h db -U postgres -c "CREATE DATABASE vjit_network"
+```
